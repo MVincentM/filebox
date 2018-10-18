@@ -33,6 +33,44 @@ int64_t getSyncDate(rapidjson::Document &d, std::string filename)
 	return -1;
 }
 
+bool sendFile(std::string filename)
+{
+	std::cout << "Need to re-send file (" << filename << ") !" << "\n";
+
+	std::string directory;
+	const size_t last_slash_idx = filename.rfind('\\');
+	if (std::string::npos != last_slash_idx)
+		directory = filename.substr(0, last_slash_idx);
+
+	std::string filenameToUse = "65485156"; // Asking for filename
+	std::string destination = directory + "\\" + filenameToUse;
+	std::string cmd = "ECHO F | xcopy \"" + filename + "\" \"" + destination + "\" ";
+	system(cmd.c_str());
+
+	// Sending file
+	cmd = "curl -T \"" + destination + "\" ftp://client:@127.0.0.1/";
+	system(cmd.c_str());
+	
+	// Deleting the copy
+	cmd = "DEL \"" + destination + "\" /F";
+	system(cmd.c_str());
+
+	return true;
+}
+
+bool getFile(std::string filename)
+{
+	std::cout << "Need to get new file (" << filename << ") !" << "\n";
+
+	std::string filenameInFTP = "564853"; // Asking for coping file in temp folder
+
+	std::string cmd = "curl -o \"" + filename + "\" \"ftp://client:@127.0.0.1/" + filenameInFTP + "\"";
+	std::cout << cmd << "\n";
+	system(cmd.c_str());
+
+	return true;
+}
+
 void checkSyncDate(rapidjson::Document &d, std::string folderPath, std::string initialFolderPath)
 {
 	for (auto & p : fs::directory_iterator(folderPath))
@@ -53,9 +91,9 @@ void checkSyncDate(rapidjson::Document &d, std::string folderPath, std::string i
 			int64_t syncDate = getSyncDate(d, filename.substr(initialFolderPath.size() + 1, SIZE_MAX));
 
 			if (mod_time > syncDate)
-				std::cout << "Need to re-send file !" << "\n";
-			else if(syncDate > mod_time)
-				std::cout << "Need to get new file !" << "\n";
+				sendFile(filename);
+			else if (syncDate > mod_time)
+				getFile(filename);
 		}
 	}
 }
