@@ -48,7 +48,10 @@ var root = {
 }
 
 function build(path){
-	var mainFolder = root; // requete ajax pour recupérer les folders/fichiers
+	jQuery.ajax({
+		method: 'POST',
+		success: '...'
+	}); // requete ajax pour recupérer les folders/fichiers
 
 	var html = '';
 	for(var i=0; i<mainFolder.children.length; i++){
