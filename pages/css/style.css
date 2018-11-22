@@ -1,54 +1,67 @@
-/* file explorer */
-body{
-	background-color: #daeeff
+body.main {
+	background-color: #e0e8ef
 }
-.root .top-bar {
-	 border-bottom: 1px solid grey;
+body.connexion {
+	background-color: #343a40;
 }
-.root .top-bar .navbar-title {
-	width: 118px;
-	font-size: 24px;
-	cursor: default;
-}
-.root .navbar-collapse{
-	display: -ms-flexbox !important;
-    display: flex !important;
-    -ms-flex-preferred-size: auto;
-    flex-basis: auto;
-}
-.root .left-bar {
-	width: 150px;
-	height: 100%;
-    position: fixed; 
-    overflow: auto;
-}
-.root .nav-link {
-	font-size: 18px;
-}
-.root .left-bar .nav-link {
-	color: rgba(255, 255, 255, 0.5);
-}
-.root .left-bar .nav-link:hover, .root .left-bar .nav-link:focus {
-	color: rgba(255, 255, 255, 0.75);
-}
-.root .left-bar .nav-link.active {
-	color: #fff;
-}
-.root .content {
-	margin-left: 150px;
-	padding: 20px;
-	border-radius: 5px;
-}
-.root .content .box {
+.box {
 	margin: 10px;
 	padding: 15px;
 	background: white;
 	border-radius: 10px;
 }
-.root .content .box .table thead th {
+.box .table thead th {
 	border-top: 0;
 }
+/* Connexion page */
+.connexion .box {
+    top: calc(50% - 104px);
+    left: calc(50% - 200px);
+    width: 400px;
+    margin: auto;
+    position: absolute;
+}
 
+/* File-explorer */
 .table.file-explorer tr.folder {
 	cursor: pointer;
+}
+
+/* Left-bar and Top-bar */
+.main .root .top-bar {
+	border-bottom: 1px solid grey;
+}
+.main .root .top-bar .navbar-title {
+	width: 118px;
+	font-size: 24px;
+	cursor: default;
+}
+.main .root .navbar-collapse{
+	display: -ms-flexbox !important;
+	display: flex !important;
+	-ms-flex-preferred-size: auto;
+	flex-basis: auto;
+}
+.main .root .left-bar {
+	width: 150px;
+	height: 100%;
+	position: fixed; 
+	overflow: auto;
+}
+.main .root .nav-link {
+	font-size: 18px;
+}
+.main .root .left-bar .nav-link {
+	color: rgba(255, 255, 255, 0.5);
+}
+.main .root .left-bar .nav-link:hover, .root .left-bar .nav-link:focus {
+	color: rgba(255, 255, 255, 0.75);
+}
+.main .root .left-bar .nav-link.active {
+	color: #fff;
+}
+.main .root .content {
+	margin-left: 150px;
+	padding: 20px;
+	border-radius: 5px;
 }
