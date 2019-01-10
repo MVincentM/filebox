@@ -9,6 +9,7 @@ body.connexion {
 	padding: 15px;
 	background: white;
 	border-radius: 10px;
+	box-shadow: 2px 2px 2px 1px rgba(78, 78, 78, 0.2);
 }
 .box .table thead th {
 	border-top: 0;
