@@ -18,14 +18,15 @@ class Template
         else $type = "file";
         $json = array(
             'type' => $type,
+            'id' => $this->getId(),
             'path' => $this->getPath(),
             'name' => $this->getName(),
-            'lastUpdate' => $this->getLastUpdate(),
+            'lastUpdate' => $this->getLastUpdate()->format("d/m/Y H:i"),
             'lastUpdator' => $this->getLastModificator(),
             'creator' => $this->getCreator(),
         );
     
-        return json_encode($json,JSON_UNESCAPED_SLASHES);
+        return $json;
     }
     /**
      * @ORM\Id()

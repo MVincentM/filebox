@@ -47,33 +47,38 @@ var root = {
 	]
 }
 
-function build(path){
-	/*jQuery.ajax({
+function build(id){
+	jQuery.ajax({
 		method: 'POST',
-		success: '...'
-	});*/ // requete ajax pour recupérer les folders/fichiers
-	var mainFolder = root;
+		url: "/get/templates/"+id,
+		dataType: "JSON",
+		success: function(data){
+			alert("bite");
+			var mainFolder = data;
 
-	var html = '';
-	for(var i=0; i<mainFolder.children.length; i++){
-		var f = mainFolder.children[i];
+			var html = '';
+			for(var i=0; i<mainFolder.children.length; i++){
+				var f = mainFolder.children[i];
 
-		html += '<tr class="'+f.type+'" path="'+f.path+f.name+'">';
-		html += '<th scope="row">'+ (i+1) +'</th>';
-		html += '<td>'+ f.name +'</td>';
-		html += '<td>'+ f.lastUpdate +'</td>';
-		html += '<td>'+ (f.version ? f.version : '') +'</td>';
-		html += '<td>'+ f.lastUpdator +'</td>';
-		html += '<td>'+ f.creator +'</td>';
-		html += '</tr>';
-	}
+				html += '<tr class="'+f.type+'" id="'+f.id+'" path="'+f.path+f.name+'">';
+				html += '<th scope="row">'+ (i+1) +'</th>';
+				html += '<td>'+ f.name +'</td>';
+				html += '<td>'+ f.lastUpdate +'</td>';
+				html += '<td>'+ (f.version ? f.version : '') +'</td>';
+				html += '<td>'+ f.lastUpdator +'</td>';
+				html += '<td>'+ f.creator +'</td>';
+				html += '</tr>';
+			}
 
-	jQuery('.file-explorer tbody').html(html);
+			jQuery('.file-explorer tbody').html(html);
 
-	jQuery('.file-explorer tr.folder').click(function(event){
-		var path = event.currentTarget.getAttribute('path');
-		build(path);
-	})
+			jQuery('.file-explorer tr.folder').click(function(event){
+				var id = event.currentTarget.getAttribute('id');
+				build(id);
+			})
+		}
+	}); // requete ajax pour recupérer les folders/fichiers
+	
 }
 
-build("/");
+build(0);

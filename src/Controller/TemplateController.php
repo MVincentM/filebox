@@ -7,6 +7,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 use App\Entity\File;
 use App\Entity\Folder;
@@ -15,10 +16,20 @@ use App\Entity\User;
 
 class TemplateController extends AbstractController
 {
+   /**
+     * @Route("/fichiers", name="view_templates")
+     */
+   public function viewTemplate()
+   {
+
+    return $this->render('file-explorer.html.twig', 
+      array(
+      ));
+  }
      /**
-       * @Route("/get/template/{id}", name="get_template")
+       * @Route("/get/templates/{id}", name="get_templates")
        */
-     public function getTemplate($id)
+     public function getTemplates($id)
      {
       // for($i=0;$i<10;$i++)
       // {
@@ -39,9 +50,15 @@ class TemplateController extends AbstractController
       {
         $json[] = $child->toJSON();
       }
-      return $this->render('test.html.twig', 
-        array(
-          'json' => json_encode($json,JSON_UNESCAPED_SLASHES)
-        ));
+
+      $response = new JsonResponse();
+
+      // echo var_dump($json);
+      $json = stripslashes(json_encode($json));
+      // return new Response($json);
+      // return $this->json($json);
+      $response = JsonResponse::fromJsonString($json);
+
+      return $response;
     }
   }
