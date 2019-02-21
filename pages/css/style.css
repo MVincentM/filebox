@@ -1,7 +1,8 @@
 body.main {
 	background-color: #e0e8ef
 }
-body.connexion {
+body.connexion,
+body.inscription {
 	background-color: #343a40;
 }
 .box {
@@ -15,12 +16,24 @@ body.connexion {
 	border-top: 0;
 }
 /* Connexion page */
-.connexion .box {
-    top: calc(50% - 104px);
-    left: calc(50% - 200px);
+.connexion .box,
+.inscription .box {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 400px;
     margin: auto;
     position: absolute;
+}
+.connexion .box .submit-container,
+.inscription .box .submit-container {
+	margin-top: 15px;
+	text-align: right;
+}
+
+.connexion .box .title-container,
+.inscription .box .title-container {
+	text-align: center;
 }
 
 /* File-explorer */
