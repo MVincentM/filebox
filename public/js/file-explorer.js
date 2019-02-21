@@ -50,14 +50,15 @@ var root = {
 function build(id){
 	jQuery.ajax({
 		method: 'POST',
-		url: "/get/templates/"+id,
+		url: "/filebox/get/templates/"+id,
 		dataType: "JSON",
 		success: function(data){
+			alert("test");
 			var mainFolder = data;
 
 			var html = '';
-			for(var i=0; i<mainFolder.length; i++){
-				var f = mainFolder[i];
+			for(var i=0; i<mainFolder.children.length; i++){
+				var f = mainFolder.children[i];
 
 				html += '<tr class="'+f.type+'" id="'+f.id+'" path="'+f.path+f.name+'">';
 				html += '<th scope="row">'+ (i+1) +'</th>';

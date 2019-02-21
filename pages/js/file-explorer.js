@@ -53,7 +53,7 @@ function build(id){
 		url: "/filebox/get/templates/"+id,
 		dataType: "JSON",
 		success: function(data){
-			alert("bite");
+			alert("test");
 			var mainFolder = data;
 
 			var html = '';

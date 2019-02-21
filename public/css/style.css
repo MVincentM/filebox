@@ -1,14 +1,13 @@
 body.main {
 	background-color: #e0e8ef
 }
-body.connexion {
+body.connexion,
+body.inscription {
 	background-color: #343a40;
 }
 .box {
 	margin: 10px;
 	padding: 15px;
-	overflow-y: scroll;
-	max-height: 500px;
 	background: white;
 	border-radius: 10px;
 	box-shadow: 2px 2px 2px 1px rgba(78, 78, 78, 0.2);
@@ -17,12 +16,24 @@ body.connexion {
 	border-top: 0;
 }
 /* Connexion page */
-.connexion .box {
-    top: calc(50% - 104px);
-    left: calc(50% - 200px);
+.connexion .box,
+.inscription .box {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 400px;
     margin: auto;
     position: absolute;
+}
+.connexion .box .submit-container,
+.inscription .box .submit-container {
+	margin-top: 15px;
+	text-align: right;
+}
+
+.connexion .box .title-container,
+.inscription .box .title-container {
+	text-align: center;
 }
 
 /* File-explorer */
@@ -32,6 +43,8 @@ body.connexion {
 
 /* Left-bar and Top-bar */
 .main .root .top-bar {
+	width: 100%;
+	position: fixed;
 	border-bottom: 1px solid grey;
 }
 .main .root .top-bar .navbar-title {
@@ -50,6 +63,7 @@ body.connexion {
 	height: 100%;
 	position: fixed; 
 	overflow: auto;
+	margin-top: 63px;
 }
 .main .root .nav-link {
 	font-size: 18px;
@@ -66,5 +80,6 @@ body.connexion {
 .main .root .content {
 	margin-left: 150px;
 	padding: 20px;
+	padding-top: 83px; /* 20 + 63 */
 	border-radius: 5px;
 }
