@@ -6,6 +6,7 @@ use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\HttpFoundation\Request;
 
 require __DIR__.'/../vendor/autoload.php';
+// require __DIR__.'/symfony/vendor/autoload.php';
 
 // The check is to ensure we don't use .env in production
 if (!isset($_SERVER['APP_ENV']) && !isset($_ENV['APP_ENV'])) {
@@ -13,7 +14,11 @@ if (!isset($_SERVER['APP_ENV']) && !isset($_ENV['APP_ENV'])) {
         throw new \RuntimeException('APP_ENV environment variable is not defined. You need to define environment variables for configuration or add "symfony/dotenv" as a Composer dependency to load variables from a .env file.');
     }
     (new Dotenv())->load(__DIR__.'/../.env');
+    // (new Dotenv())->load(__DIR__.'/symfony/.env');
+
 }
+// $_SERVER['APP_ENV']='dev';
+// $_SERVER['DATABASE_URL']='mysql://vincentmut20100:BaVinc53Ma@vincentmut20100.mysql.db/vincentmut20100';
 
 $env = $_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? 'dev';
 $debug = (bool) ($_SERVER['APP_DEBUG'] ?? $_ENV['APP_DEBUG'] ?? ('prod' !== $env));

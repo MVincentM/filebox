@@ -38,6 +38,7 @@ class User
     /**
      * @ORM\Column(type="string", length=15)
      */
+    private $key
 
     public function getId(): ?int
     {
