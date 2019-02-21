@@ -50,7 +50,7 @@ var root = {
 function build(id){
 	jQuery.ajax({
 		method: 'POST',
-		url: "/get/templates/"+id,
+		url: "/filebox/get/templates/"+id,
 		dataType: "JSON",
 		success: function(data){
 			alert("bite");
