@@ -30,6 +30,8 @@ body.connexion {
 
 /* Left-bar and Top-bar */
 .main .root .top-bar {
+	width: 100%;
+	position: fixed;
 	border-bottom: 1px solid grey;
 }
 .main .root .top-bar .navbar-title {
@@ -48,6 +50,7 @@ body.connexion {
 	height: 100%;
 	position: fixed; 
 	overflow: auto;
+	margin-top: 63px;
 }
 .main .root .nav-link {
 	font-size: 18px;
@@ -64,5 +67,6 @@ body.connexion {
 .main .root .content {
 	margin-left: 150px;
 	padding: 20px;
+	padding-top: 83px; /* 20 + 63 */
 	border-radius: 5px;
 }
