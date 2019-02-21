@@ -11,15 +11,48 @@ use App\Entity\Association;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 
 class UserController extends AbstractController
 {
+        /**
+         * @Route("/api/connexion", name="api_connexion")
+         */
+        public function api_connexion(Request $request,Session $session)
+        {
+          $session->set('isValid', 'false');
+          $email = $request->query->get('email');
+          $mdp = $request->query->get('pass');
+
+          $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['mail' => $email]);
+          $res = false;
+          // echo password_hash(md5("test"), PASSWORD_BCRYPT);
+          $session->set('qui', 'nope');
+          $session->set('typeCompte', 'nope');
+
+          if(password_verify($mdp,$user->getMdp()))
+          {
+              $res = true;
+
+              $session->set('isValid', 'true');
+              $session->set('qui', $user->getId());
+              $session->set('typeCompte', 'user');
+          }
+
+          $response = new JsonResponse();
+
+          $json = stripslashes(json_encode($res));
+          $response = JsonResponse::fromJsonString($json);
+
+          return $response;
+      }
+
       /**
-       * @Route("verifier/connexion", name="verifier_connexion")
+       * @Route("/verifier/connexion", name="verifier_connexion")
        */
-  public function verifier_connexion(Request $request)
-    {
+      public function verifier_connexion(Request $request)
+      {
         $session = new Session();
         $session->start();
         $session->set('isValid', 'false');
@@ -27,6 +60,7 @@ class UserController extends AbstractController
         $email = $request->request->get('email');
         $mdp = $request->request->get('pass');
         $res = "false";
+
 
         $session->set('qui', 'nope');
         $session->set('typeCompte', 'nope');
@@ -42,15 +76,15 @@ class UserController extends AbstractController
             return $this->redirectToRoute('index');
         }
 
-      return new Response('User : '.$res);
+        return new Response('User : '.$res);
     }
 
      /**
        * @Route("/new", name="new")
        */
 
-    public function new(Request $request)
-    {
+     public function new(Request $request)
+     {
         return $this->render('new_compte.html.twig', [
         ]);
     }
@@ -59,17 +93,16 @@ class UserController extends AbstractController
        * @Route("/new/user", name="new_user")
        */
 
-    public function new_user(Request $request)
-    {
-        if ($request->request->get('email') && $request->request->get('pass1') && $request->request->get('pass2') && $request->request->get('nom') && $request->request->get('prenom') && $request->request->get('telephone')) {
-            
+     public function new_user(Request $request)
+     {
+        if ($request->request->get('email') && $request->request->get('pass1') && $request->request->get('pass2') && $request->request->get('nom') && $request->request->get('prenom')) {
+
             $entityManager = $this->getDoctrine()->getManager();
             $user = new User();
             $user->setNom($request->request->get('nom'));
             $user->setPrenom($request->request->get('prenom'));
             $user->setMail($request->request->get('email'));
-            $user->setMdp($request->request->get('pass1'));
-            $user->setNumero($request->request->get('telephone'));
+            $user->setMdp(password_hash(md5($request->request->get('pass1')), PASSWORD_BCRYPT));
 
             // tell Doctrine you want to (eventually) save the Product (no queries yet)
             $entityManager->persist($user);
