@@ -16,28 +16,39 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class UserController extends AbstractController
 {
+        public function get_ip() {
+            // IP si internet partagé
+            if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+                return $_SERVER['HTTP_CLIENT_IP'];
+            }
+            // IP derrière un proxy
+            elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+                return $_SERVER['HTTP_X_FORWARDED_FOR'];
+            }
+            // Sinon : IP normale
+            else {
+                return (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '');
+            }
+        }
+
         /**
          * @Route("/api/connexion", name="api_connexion")
          */
         public function api_connexion(Request $request,Session $session)
         {
-          $session->set('isValid', 'false');
           $email = $request->query->get('email');
           $mdp = $request->query->get('pass');
 
           $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['mail' => $email]);
           $res = false;
-          // echo password_hash(md5("test"), PASSWORD_BCRYPT);
-          $session->set('qui', 'nope');
-          $session->set('typeCompte', 'nope');
 
           if(password_verify($mdp,$user->getMdp()))
           {
               $res = true;
+              $user->setIp(UserController::get_ip());
 
-              $session->set('isValid', 'true');
-              $session->set('qui', $user->getId());
-              $session->set('typeCompte', 'user');
+              $entityManager = $this->getDoctrine()->getManager();
+              $entityManager->flush();
           }
 
           $response = new JsonResponse();
@@ -80,12 +91,12 @@ class UserController extends AbstractController
     }
 
      /**
-       * @Route("/new", name="new")
+       * @Route("/inscription", name="new")
        */
 
      public function new(Request $request)
      {
-        return $this->render('new_compte.html.twig', [
+        return $this->render('inscription.html.twig', [
         ]);
     }
 

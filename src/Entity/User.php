@@ -38,7 +38,15 @@ class User
     /**
      * @ORM\Column(type="string", length=15)
      */
-    private $key
+    private $authkey;
+    /**
+     * @ORM\Column(type="string", length=15)
+     */
+    private $ip;
+    /**
+     * @ORM\Column(type="datetime", length=15)
+     */
+    private $dateKey; 
 
     public function getId(): ?int
     {
@@ -89,6 +97,54 @@ class User
     public function setMdp(string $mdp): self
     {
         $this->mdp = $mdp;
+
+        return $this;
+    }
+
+    public function getKey(): ?string
+    {
+        return $this->key;
+    }
+
+    public function setKey(string $key): self
+    {
+        $this->key = $key;
+
+        return $this;
+    }
+
+    public function getIp(): ?string
+    {
+        return $this->ip;
+    }
+
+    public function setIp(string $ip): self
+    {
+        $this->ip = $ip;
+
+        return $this;
+    }
+
+    public function getDateKey(): ?\DateTimeInterface
+    {
+        return $this->dateKey;
+    }
+
+    public function setDateKey(\DateTimeInterface $dateKey): self
+    {
+        $this->dateKey = $dateKey;
+
+        return $this;
+    }
+
+    public function getAuthkey(): ?string
+    {
+        return $this->authkey;
+    }
+
+    public function setAuthkey(string $authkey): self
+    {
+        $this->authkey = $authkey;
 
         return $this;
     }
