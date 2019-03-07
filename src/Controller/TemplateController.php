@@ -8,11 +8,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 use App\Entity\File;
 use App\Entity\Folder;
 use App\Entity\Template;
 use App\Entity\User;
+use \Datetime;
 
 class TemplateController extends AbstractController
 {
@@ -25,6 +27,43 @@ class TemplateController extends AbstractController
     return $this->render('file-explorer.html.twig', 
       array(
       ));
+  }
+
+  /**
+    * @Route("/api/get/racine", name="get_racine")
+    */
+  public function getRacine(Session $session, Request $request)
+  {
+    $authkey = $request->query->get("authkey");
+    $res = "error";
+    if($authkey != null)
+    { 
+      $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['authkey' => $authkey]);
+      if($user != null)
+      {
+        $dateNom = new \Datetime();
+        $dateKey = $user->getDateKey();
+        $interval = $dateNom->diff($dateKey);
+
+        if(intval($interval->format('%R%a') >= 0))
+        {
+          $ipSaved = $user->getIp();
+          $ipNom = hash("md5",UserController::get_ip());
+
+          if($ipNom == $ipSaved)
+          {
+            $res = $this->getDoctrine()->getRepository(Template::class)->findOneBy(['creator' => $user->getId(), 'parent' => NULL])->getId();
+          }
+        }
+      }
+    }
+
+    $response = new JsonResponse();
+
+    $json = stripslashes(json_encode($res));
+    $response = JsonResponse::fromJsonString($json);
+
+    return $response;  
   }
      /**
        * @Route("/get/templates/{id}", name="get_templates")
