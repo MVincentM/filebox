@@ -2,13 +2,15 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Connexion</title>
+        <title>Login</title>
         <link rel="stylesheet" href="../bootstrap/css/bootstrap.css">
         <link rel="stylesheet" href="css/style.css">
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.0/dist/jquery.validate.min.js"></script>
 		<script src="../bootstrap/js/bootstrap.js"></script>
+		<script src="js/login.js"></script>
     </head>
-    <body class="connexion">
+    <body class="login">
 		<div class="box">
 			<div class="title-container">
 				<h1>FILEBOX</h1>
@@ -17,11 +19,11 @@
 			<form method="post">
 				<div class="field">
 					<label>Email</label>
-					<input type="text" class="form-control">
+					<input type="text" class="form-control" name="login">
 				</div>
 				<div class="field">
 					<label>Password</label>
-					<input type="password" class="form-control">
+					<input type="password" class="form-control" name="password">
 				</div>
 				<div class="submit-container">
 					<button class="btn btn-primary" type="submit">Connect</button>

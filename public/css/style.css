@@ -5,6 +5,9 @@ body.connexion,
 body.inscription {
 	background-color: #343a40;
 }
+form label.error {
+	color: red;
+}
 .box {
 	margin: 10px;
 	padding: 15px;
