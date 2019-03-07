@@ -18,27 +18,12 @@ use \Datetime;
 
 class TemplateController extends AbstractController
 {
-   /**
-     * @Route("/fichiers", name="view_templates")
-     */
-   public function viewTemplate()
-   {
-
-    return $this->render('file-explorer.html.twig', 
-      array(
-      ));
-  }
-
-  /**
-    * @Route("/api/get/racine", name="get_racine")
-    */
-  public function getRacine(Session $session, Request $request)
+  public function verifyAuthKey($authkey)
   {
-    $authkey = $request->query->get("authkey");
-    $res = "error";
+    $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['authkey' => $authkey]);
+    $res = -1;
     if($authkey != null)
     { 
-      $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['authkey' => $authkey]);
       if($user != null)
       {
         $dateNom = new \Datetime();
@@ -57,6 +42,29 @@ class TemplateController extends AbstractController
         }
       }
     }
+    return $res;
+  }
+   /**
+     * @Route("/fichiers", name="view_templates")
+     */
+   public function viewTemplate()
+   {
+
+    return $this->render('file-explorer.html.twig', 
+      array(
+      ));
+  }
+
+  /**
+    * @Route("/api/get/racine", name="get_racine")
+    */
+  public function getRacine(Session $session, Request $request)
+  {
+    $authkey = $request->query->get("authkey");
+    $res = "error";
+    $verif = $this->verifyAuthKey($authkey);
+
+    if($verif > -1) $res = $verif;
 
     $response = new JsonResponse();
 
@@ -70,33 +78,58 @@ class TemplateController extends AbstractController
        */
      public function getTemplates($id, Session $session)
      {
-      // for($i=0;$i<10;$i++)
-      // {
-      //   $template = new Folder();
-      //   $template->setCreator(0);
-      //   $template->setLastModificator(0);
-      //   $template->setName("Folder ".$i);
-      //   $template->setParent(0);
-      //   $template->setPath("/pathTest");
-
-      //   $entityManager = $this->getDoctrine()->getManager();
-      //   $entityManager->persist($template);
-      //   $entityManager->flush();
-      // }
-      $json = array();
-      $children = $this->getDoctrine()->getRepository(Template::class)->findBy(['parent' => $id, 'creator' => $session->get('qui')]);
-      foreach($children as $child)
+      $template =  $this->getDoctrine()->getRepository(Template::class)->findOneById($id);
+      $json = "error";
+      if($session->get("isValid") == "true" && $template->getCreator() == $this->getDoctrine()->getRepository(User::class)->findOneById(intval($session->get("qui")))->getId())
       {
-        $jsonTemp = $child->toJSON(); 
-        $jsonTemp["creator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["creator"])])->getUserName();
-        $jsonTemp["lastUpdator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["lastUpdator"])])->getUserName();
-        $json[] = $jsonTemp;
+        $json = array();
+        $children = $this->getDoctrine()->getRepository(Template::class)->findBy(['parent' => $id, 'creator' => $session->get('qui')]);
+        foreach($children as $child)
+        {
+          $jsonTemp = $child->toJSON(); 
+          $jsonTemp["creator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["creator"])])->getUserName();
+          $jsonTemp["lastUpdator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["lastUpdator"])])->getUserName();
+          $json[] = $jsonTemp;
+        }
       }
-
       $response = new JsonResponse();
 
       // echo var_dump($json);
       $json = stripslashes(json_encode($json));
+
+      // return new Response($json);
+      // return $this->json($json);
+      $response = JsonResponse::fromJsonString($json);
+
+      return $response;
+    }
+     /**
+       * @Route("/api/get/templates/{id}", name="api_get_templates")
+       */
+     public function getTemplatesAPI($id, Request $request)
+     {
+      $template =  $this->getDoctrine()->getRepository(Template::class)->findOneById($id);
+      $authkey = $request->query->get("authkey");
+      $verif = $this->verifyAuthKey($authkey);
+      $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['authkey' => $authkey]);
+
+      if($verif > -1)
+      {
+        $json = array();
+        $children = $this->getDoctrine()->getRepository(Template::class)->findBy(['parent' => $id, 'creator' => $user->getId()]);
+        foreach($children as $child)
+        {
+          $jsonTemp = $child->toJSON(); 
+          $jsonTemp["creator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["creator"])])->getUserName();
+          $jsonTemp["lastUpdator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["lastUpdator"])])->getUserName();
+          $json[] = $jsonTemp;
+        }
+      }
+      $response = new JsonResponse();
+
+      // echo var_dump($json);
+      $json = stripslashes(json_encode($json));
+
       // return new Response($json);
       // return $this->json($json);
       $response = JsonResponse::fromJsonString($json);
