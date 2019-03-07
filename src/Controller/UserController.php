@@ -79,18 +79,22 @@ class UserController extends AbstractController
         $session->set('qui', 'nope');
         $session->set('typeCompte', 'nope');
 
-        if(password_verify($mdp,$user->getMdp()))
-        {
-            $res = "true";
+        if($user)
+        {            
+            if(password_verify($mdp,$user->getMdp()))
+            {
+                $res = "true";
 
-            $session->set('isValid', 'true');
-            $session->set('qui', $user->getId());
-            $session->set('typeCompte', 'user');
+                $session->set('isValid', 'true');
+                $session->set('qui', $user->getId());
+                $session->set('typeCompte', 'user');
 
-            return $this->redirectToRoute('index');
+                return $this->redirectToRoute('index');
+            }
         }
+        else return $this->redirectToRoute('login');
 
-        return new Response('User : '.$res);
+        // return new Response('User : '.$res);
     }
 
      /**
@@ -117,15 +121,16 @@ class UserController extends AbstractController
             $user->setPrenom($request->request->get('prenom'));
             $user->setMail($request->request->get('email'));
             $user->setMdp(password_hash($request->request->get('pass1'), PASSWORD_BCRYPT));
+            $entityManager->persist($user);
+            $entityManager->flush();
 
+            $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['mail' => $request->request->get('email')]);
             $dossierRacine = new Folder();
             $dossierRacine->setCreator($user->getId());
             $dossierRacine->setLastModificator($user->getId());
             $dossierRacine->setName("Racine");
-            $dossierRacine->setParent(null);
             $dossierRacine->setPath("/pathTest");
 
-            $entityManager->persist($user);
             $entityManager->persist($dossierRacine);
             $entityManager->flush();
 

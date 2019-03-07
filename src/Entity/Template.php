@@ -69,7 +69,7 @@ class Template
         return $this->creator;
     }
 
-    public function setCreator(string $creator): self
+    public function setCreator(int $creator): self
     {
         $this->creator = $creator;
 
