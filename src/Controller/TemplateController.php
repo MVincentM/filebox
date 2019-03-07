@@ -118,7 +118,7 @@ class TemplateController extends AbstractController
       {
         $json = array();
 
-        $children = $this->getDoctrine()->getRepository(Template::class)->findBy(['parent' => $id, 'creator' => $session->get('qui')]);
+        $children = $this->getDoctrine()->getRepository(Template::class)->findBy(['parent' => $id, 'creator' => $user->getId()]);
         foreach($children as $child)
         {
           $jsonTemp = $child->toJSON(); 
