@@ -48,7 +48,10 @@ class TemplateController extends AbstractController
       $children = $this->getDoctrine()->getRepository(Template::class)->findBy(['parent' => $id]);
       foreach($children as $child)
       {
-        $json[] = $child->toJSON();
+        $jsonTemp = $child->toJSON(); 
+        $jsonTemp["creator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["creator"])])->getUserName();
+        $jsonTemp["lastUpdator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["lastUpdator"])])->getUserName();
+        $json[] = $jsonTemp;
       }
 
       $response = new JsonResponse();

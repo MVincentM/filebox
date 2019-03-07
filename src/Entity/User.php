@@ -9,6 +9,11 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class User
 {
+    public function getUserName(){
+        $name = $this->getPrenom()." ".$this->getNom();
+        return $name;
+    }
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
