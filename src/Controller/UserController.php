@@ -17,6 +17,7 @@ use App\Entity\File;
 use App\Entity\Folder;
 use App\Entity\Template;
 use \Datetime;
+use \DateInterval;
 
 class UserController extends AbstractController
 {
@@ -35,6 +36,18 @@ class UserController extends AbstractController
         }
     }
 
+    public function genererChaineAleatoire($longueur)
+    {
+     $caracteres = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+     $longueurMax = strlen($caracteres);
+     $chaineAleatoire = '';
+     for ($i = 0; $i < $longueur; $i++)
+     {
+     $chaineAleatoire .= $caracteres[rand(0, $longueurMax - 1)];
+     }
+     return $chaineAleatoire;
+    }
+
         /**
          * @Route("/api/connexion", name="api_connexion")
          */
@@ -49,9 +62,11 @@ class UserController extends AbstractController
           //on part du principe qu'on est en https donc mdp pas en clair !!
           if(password_verify($mdp,$user->getMdp()))
           {
-              $res = true;
-              $user->setIp(UserController::get_ip());
-
+              $user->setIp(hash("md5",UserController::get_ip()));
+              $date = new \Datetime();
+              $user->setDateKey($date->add(new \DateInterval('P1D')));
+              $user->setAuthkey(UserController::genererChaineAleatoire(20));
+              $res = $user->getAuthkey();
               $entityManager = $this->getDoctrine()->getManager();
               $entityManager->flush();
           }
