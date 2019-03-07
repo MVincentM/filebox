@@ -66,7 +66,7 @@ class UserController extends AbstractController
               $date = new \Datetime();
               $user->setDateKey($date->add(new \DateInterval('P1D')));
               $user->setAuthkey(UserController::genererChaineAleatoire(20));
-              $res = "f".$user->getAuthkey();
+              $res = "b".$user->getAuthkey();
               $entityManager = $this->getDoctrine()->getManager();
               $entityManager->flush();
           }
