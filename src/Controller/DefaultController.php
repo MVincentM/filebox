@@ -17,7 +17,8 @@ class DefaultController extends AbstractController
      {
        if($session->get('isValid') == "true")
        {
-        return $this->render('file-explorer.html.twig', [          
+        return $this->render('file-explorer.html.twig', [  
+          "racine" => $session->get('racine')      
         ]);
       }
 

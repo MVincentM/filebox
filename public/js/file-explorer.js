@@ -79,5 +79,3 @@ function build(id){
 	}); // requete ajax pour recupérer les folders/fichiers
 	
 }
-
-build(0);

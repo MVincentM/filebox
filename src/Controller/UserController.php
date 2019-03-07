@@ -88,9 +88,10 @@ class UserController extends AbstractController
                 $session->set('isValid', 'true');
                 $session->set('qui', $user->getId());
                 $session->set('typeCompte', 'user');
-
+                $session->set('racine',$this->getDoctrine()->getRepository(Template::class)->findOneBy(['creator' => $user->getId(), 'parent' => NULL])->getId());
                 return $this->redirectToRoute('index');
             }
+            else return $this->redirectToRoute('login');
         }
         else return $this->redirectToRoute('login');
 

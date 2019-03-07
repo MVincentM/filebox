@@ -29,7 +29,7 @@ class TemplateController extends AbstractController
      /**
        * @Route("/get/templates/{id}", name="get_templates")
        */
-     public function getTemplates($id)
+     public function getTemplates($id, Session $session)
      {
       // for($i=0;$i<10;$i++)
       // {
@@ -45,7 +45,7 @@ class TemplateController extends AbstractController
       //   $entityManager->flush();
       // }
       $json = array();
-      $children = $this->getDoctrine()->getRepository(Template::class)->findBy(['parent' => $id]);
+      $children = $this->getDoctrine()->getRepository(Template::class)->findBy(['parent' => $id, 'creator' => $session->get('qui')]);
       foreach($children as $child)
       {
         $jsonTemp = $child->toJSON(); 
