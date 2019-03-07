@@ -18,6 +18,14 @@ form label.error {
 .box .table thead th {
 	border-top: 0;
 }
+.hide {
+	display: none;
+}
+/* Modals */
+.prompt-modal .modal-message {
+	margin: 0 0 10px 10px;
+}
+
 /* Connexion page */
 .connexion .box,
 .inscription .box {
@@ -40,10 +48,30 @@ form label.error {
 }
 
 /* File-explorer */
-.table.file-explorer tr.folder {
+.content .table.file-explorer tr.folder {
 	cursor: pointer;
 }
-
+.content .header {
+	margin: 15px;
+	min-height: 40px;
+}
+.content .header .buttons {
+	float: right;
+}
+.content .header .buttons button {
+	margin-left: 10px;
+}
+.content .header .breadcrumbs .icon {
+	width: 40px;
+	vertical-align: text-bottom;
+}
+.content .header .breadcrumbs span {
+	font-size: 17px;
+}
+.content .empty-table {
+	text-align: center;
+	font-style: italic;
+}
 /* Left-bar and Top-bar */
 .main .root .top-bar {
 	width: 100%;

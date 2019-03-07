@@ -18,6 +18,9 @@ form label.error {
 .box .table thead th {
 	border-top: 0;
 }
+.hide {
+	display: none;
+}
 /* Login and register pages */
 .login .box,
 .register .box {

@@ -36,6 +36,16 @@
 			<!-- Content -->
 			<div class="content">
 				<div class="box">
+					<div class="header">
+						<div class="buttons">
+							<button class="btn btn-info add-folder">Add folder</button>
+							<button class="btn btn-info add-file">Add file</button>
+						</div>
+						<div class="breadcrumbs">
+							<img class="icon" src="{{ asset('icons/home.jpg') }}">
+							<span>Home</span>
+						</div>
+					</div>
 					<table class="table table-hover file-explorer">
 						<thead>
 							<tr>
@@ -50,6 +60,7 @@
 						<tbody>
 						</tbody>
 					</table>
+					<div class="empty-table hide">You don't have any files or folders yet.</div>
 				</div>
 			</div>
 		</div>
