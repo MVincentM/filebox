@@ -14,26 +14,26 @@
 				<h1>FILEBOX</h1>
 				<i>Register</i>
 			</div>
-			<form method="post">
+			<form method="post" action="{{path('new_user')}}">
 				<div class="field">
 					<label>Firstname</label>
-					<input type="text" class="form-control">
+					<input name="prenom" type="text" class="form-control">
 				</div>
 				<div class="field">
 					<label>Lastname</label>
-					<input type="text" class="form-control">
+					<input name="nom" type="text" class="form-control">
 				</div>
 				<div class="field">
 					<label>Email</label>
-					<input type="text" class="form-control">
+					<input name="email" type="text" class="form-control">
 				</div>
 				<div class="field">
 					<label>Password</label>
-					<input type="password" class="form-control">
+					<input name="pass1" type="password" class="form-control">
 				</div>
 				<div class="field">
 					<label>Confirm password</label>
-					<input type="password" class="form-control">
+					<input name="pass2" type="password" class="form-control">
 				</div>
 				<div class="submit-container">
 					<button class="btn btn-primary" type="submit">Connect</button>

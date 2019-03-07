@@ -14,14 +14,14 @@
 				<h1>FILEBOX</h1>
 				<i>Sign in</i>
 			</div>
-			<form method="post">
+			<form method="post" action="{{path('verifier_connexion')}}">
 				<div class="field">
 					<label>Email</label>
-					<input type="text" class="form-control">
+					<input name="email" type="text" class="form-control">
 				</div>
 				<div class="field">
 					<label>Password</label>
-					<input type="password" class="form-control">
+					<input name="pass" type="password" class="form-control">
 				</div>
 				<div class="submit-container">
 					<button class="btn btn-primary" type="submit">Connect</button>

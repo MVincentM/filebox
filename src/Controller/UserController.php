@@ -42,6 +42,7 @@ class UserController extends AbstractController
           $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['mail' => $email]);
           $res = false;
 
+          //on part du principe qu'on est en https donc mdp pas en clair !!
           if(password_verify($mdp,$user->getMdp()))
           {
               $res = true;
@@ -62,26 +63,25 @@ class UserController extends AbstractController
       /**
        * @Route("/verifier/connexion", name="verifier_connexion")
        */
-      public function verifier_connexion(Request $request)
+      public function verifier_connexion(Request $request, Session $session)
       {
-        $session = new Session();
-        $session->start();
         $session->set('isValid', 'false');
         
         $email = $request->request->get('email');
         $mdp = $request->request->get('pass');
         $res = "false";
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['mail' => $email]);
 
 
         $session->set('qui', 'nope');
         $session->set('typeCompte', 'nope');
 
-        if($this->getDoctrine()->getRepository(User::class)->findOneBy(['mail' => $email,'mdp' => $mdp]))
+        if(password_verify($mdp,$user->getMdp()))
         {
             $res = "true";
 
             $session->set('isValid', 'true');
-            $session->set('qui', $this->getDoctrine()->getRepository(User::class)->findOneBy(['mail' => $email,'mdp' => $mdp])->getId());
+            $session->set('qui', $user->getId());
             $session->set('typeCompte', 'user');
 
             return $this->redirectToRoute('index');
@@ -113,7 +113,7 @@ class UserController extends AbstractController
             $user->setNom($request->request->get('nom'));
             $user->setPrenom($request->request->get('prenom'));
             $user->setMail($request->request->get('email'));
-            $user->setMdp(password_hash(md5($request->request->get('pass1')), PASSWORD_BCRYPT));
+            $user->setMdp(password_hash($request->request->get('pass1'), PASSWORD_BCRYPT));
 
             // tell Doctrine you want to (eventually) save the Product (no queries yet)
             $entityManager->persist($user);
@@ -121,12 +121,16 @@ class UserController extends AbstractController
             // actually executes the queries (i.e. the INSERT query)
             $entityManager->flush();
 
-            return new Response('Nouveau User avec lid : '.$user->getId());
+            // return new Response('Nouveau User avec lid : '.$user->getId());
+            return $this->redirectToRoute('index');
+
         }
         else 
         {
-            return $this->render('bas_pas_Co.html.twig', [
-            ]);
+            return $this->redirectToRoute('new');
+
+            // return $this->render('bas_pas_Co.html.twig', [
+            // ]);
         }
     }
 }
