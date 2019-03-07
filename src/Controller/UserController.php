@@ -16,20 +16,20 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class UserController extends AbstractController
 {
-        public function get_ip() {
+    public function get_ip() {
             // IP si internet partagé
-            if (isset($_SERVER['HTTP_CLIENT_IP'])) {
-                return $_SERVER['HTTP_CLIENT_IP'];
-            }
-            // IP derrière un proxy
-            elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-                return $_SERVER['HTTP_X_FORWARDED_FOR'];
-            }
-            // Sinon : IP normale
-            else {
-                return (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '');
-            }
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            return $_SERVER['HTTP_CLIENT_IP'];
         }
+            // IP derrière un proxy
+        elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            return $_SERVER['HTTP_X_FORWARDED_FOR'];
+        }
+            // Sinon : IP normale
+        else {
+            return (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '');
+        }
+    }
 
         /**
          * @Route("/api/connexion", name="api_connexion")
@@ -115,8 +115,16 @@ class UserController extends AbstractController
             $user->setMail($request->request->get('email'));
             $user->setMdp(password_hash($request->request->get('pass1'), PASSWORD_BCRYPT));
 
+            $dossierRacine = new Folder();
+            $dossierRacine->setCreator($user->getId());
+            $dossierRacine->setLastModificator($user->getId());
+            $dossierRacine->setName("Racine");
+            $dossierRacine->setParent(null);
+            $dossierRacine->setPath("/pathTest");
+
             // tell Doctrine you want to (eventually) save the Product (no queries yet)
             $entityManager->persist($user);
+            $entityManager->persist($dossierRacine);
 
             // actually executes the queries (i.e. the INSERT query)
             $entityManager->flush();
