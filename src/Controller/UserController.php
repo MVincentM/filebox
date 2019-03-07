@@ -13,6 +13,9 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+use App\Entity\File;
+use App\Entity\Folder;
+use App\Entity\Template;
 
 class UserController extends AbstractController
 {
@@ -122,16 +125,11 @@ class UserController extends AbstractController
             $dossierRacine->setParent(null);
             $dossierRacine->setPath("/pathTest");
 
-            // tell Doctrine you want to (eventually) save the Product (no queries yet)
             $entityManager->persist($user);
             $entityManager->persist($dossierRacine);
-
-            // actually executes the queries (i.e. the INSERT query)
             $entityManager->flush();
 
-            // return new Response('Nouveau User avec lid : '.$user->getId());
             return $this->redirectToRoute('index');
-
         }
         else 
         {
