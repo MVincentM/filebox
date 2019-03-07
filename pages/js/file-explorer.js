@@ -50,7 +50,7 @@ var root = {
 function build(id){
 	jQuery.ajax({
 		method: 'POST',
-		url: "/filebox/get/templates/"+id,
+		url: "http://vincentmm.com/filebox/get/templates/"+id,
 		dataType: "JSON",
 		success: function(data){
 			alert("test");
