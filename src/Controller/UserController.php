@@ -13,31 +13,46 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+use App\Entity\File;
+use App\Entity\Folder;
+use App\Entity\Template;
 
 class UserController extends AbstractController
 {
+    public function get_ip() {
+            // IP si internet partagé
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            return $_SERVER['HTTP_CLIENT_IP'];
+        }
+            // IP derrière un proxy
+        elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            return $_SERVER['HTTP_X_FORWARDED_FOR'];
+        }
+            // Sinon : IP normale
+        else {
+            return (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '');
+        }
+    }
+
         /**
          * @Route("/api/connexion", name="api_connexion")
          */
         public function api_connexion(Request $request,Session $session)
         {
-          $session->set('isValid', 'false');
           $email = $request->query->get('email');
           $mdp = $request->query->get('pass');
 
           $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['mail' => $email]);
           $res = false;
-          // echo password_hash(md5("test"), PASSWORD_BCRYPT);
-          $session->set('qui', 'nope');
-          $session->set('typeCompte', 'nope');
 
+          //on part du principe qu'on est en https donc mdp pas en clair !!
           if(password_verify($mdp,$user->getMdp()))
           {
               $res = true;
+              $user->setIp(UserController::get_ip());
 
-              $session->set('isValid', 'true');
-              $session->set('qui', $user->getId());
-              $session->set('typeCompte', 'user');
+              $entityManager = $this->getDoctrine()->getManager();
+              $entityManager->flush();
           }
 
           $response = new JsonResponse();
@@ -51,41 +66,45 @@ class UserController extends AbstractController
       /**
        * @Route("/verifier/connexion", name="verifier_connexion")
        */
-      public function verifier_connexion(Request $request)
+      public function verifier_connexion(Request $request, Session $session)
       {
-        $session = new Session();
-        $session->start();
         $session->set('isValid', 'false');
         
         $email = $request->request->get('email');
         $mdp = $request->request->get('pass');
         $res = "false";
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['mail' => $email]);
 
 
         $session->set('qui', 'nope');
         $session->set('typeCompte', 'nope');
 
-        if($this->getDoctrine()->getRepository(User::class)->findOneBy(['mail' => $email,'mdp' => $mdp]))
-        {
-            $res = "true";
+        if($user)
+        {            
+            if(password_verify($mdp,$user->getMdp()))
+            {
+                $res = "true";
 
-            $session->set('isValid', 'true');
-            $session->set('qui', $this->getDoctrine()->getRepository(User::class)->findOneBy(['mail' => $email,'mdp' => $mdp])->getId());
-            $session->set('typeCompte', 'user');
-
-            return $this->redirectToRoute('index');
+                $session->set('isValid', 'true');
+                $session->set('qui', $user->getId());
+                $session->set('typeCompte', 'user');
+                $session->set('racine',$this->getDoctrine()->getRepository(Template::class)->findOneBy(['creator' => $user->getId(), 'parent' => NULL])->getId());
+                return $this->redirectToRoute('index');
+            }
+            else return $this->redirectToRoute('login');
         }
+        else return $this->redirectToRoute('login');
 
-        return new Response('User : '.$res);
+        // return new Response('User : '.$res);
     }
 
      /**
-       * @Route("/new", name="new")
+       * @Route("/inscription", name="new")
        */
 
      public function new(Request $request)
      {
-        return $this->render('new_compte.html.twig', [
+        return $this->render('inscription.html.twig', [
         ]);
     }
 
@@ -102,20 +121,28 @@ class UserController extends AbstractController
             $user->setNom($request->request->get('nom'));
             $user->setPrenom($request->request->get('prenom'));
             $user->setMail($request->request->get('email'));
-            $user->setMdp(password_hash(md5($request->request->get('pass1')), PASSWORD_BCRYPT));
-
-            // tell Doctrine you want to (eventually) save the Product (no queries yet)
+            $user->setMdp(password_hash($request->request->get('pass1'), PASSWORD_BCRYPT));
             $entityManager->persist($user);
-
-            // actually executes the queries (i.e. the INSERT query)
             $entityManager->flush();
 
-            return new Response('Nouveau User avec lid : '.$user->getId());
+            $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['mail' => $request->request->get('email')]);
+            $dossierRacine = new Folder();
+            $dossierRacine->setCreator($user->getId());
+            $dossierRacine->setLastModificator($user->getId());
+            $dossierRacine->setName("Racine");
+            $dossierRacine->setPath("/pathTest");
+
+            $entityManager->persist($dossierRacine);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('index');
         }
         else 
         {
-            return $this->render('bas_pas_Co.html.twig', [
-            ]);
+            return $this->redirectToRoute('new');
+
+            // return $this->render('bas_pas_Co.html.twig', [
+            // ]);
         }
     }
 }

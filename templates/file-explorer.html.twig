@@ -26,7 +26,10 @@
 			    <a class="nav-link active" href="#">Home</a>
 			  </li>
 			  <li class="nav-item">
-			    <a class="nav-link" href="#">Mes infos</a>
+			    <a class="nav-link" href="#">My profil</a>
+			  </li>
+			  <li class="nav-item">
+			    <a class="nav-link" href="{{path('deconnexion')}}">Log out</a>
 			  </li>
 			</ul>
 
@@ -52,5 +55,8 @@
 		</div>
 		<!-- scripts -->
 		<script src="{{ asset('js/file-explorer.js') }}"></script>
+		<script type="text/javascript">
+			build({{racine}});
+		</script>
     </body>
 </html>

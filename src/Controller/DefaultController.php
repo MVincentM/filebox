@@ -17,12 +17,14 @@ class DefaultController extends AbstractController
      {
        if($session->get('isValid') == "true")
        {
-        return $this->render('filebox.html.twig', [          
+        return $this->render('file-explorer.html.twig', [  
+          "racine" => $session->get('racine')      
         ]);
       }
 
-      return $this->render('presentation.html.twig', [      
-      ]);
+      // return $this->render('presentation.html.twig', [      
+      // ]);
+      return $this->redirectToRoute('login');
     }
       
 	   /**
