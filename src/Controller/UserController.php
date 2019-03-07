@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Entity\File;
 use App\Entity\Folder;
 use App\Entity\Template;
+use \Datetime;
 
 class UserController extends AbstractController
 {
@@ -131,6 +132,7 @@ class UserController extends AbstractController
             $dossierRacine->setLastModificator($user->getId());
             $dossierRacine->setName("Racine");
             $dossierRacine->setPath("/pathTest");
+            $dossierRacine->setLastUpdate(new \Datetime());
 
             $entityManager->persist($dossierRacine);
             $entityManager->flush();
