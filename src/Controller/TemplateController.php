@@ -80,7 +80,7 @@ class TemplateController extends AbstractController
      {
       $template =  $this->getDoctrine()->getRepository(Template::class)->findOneById($id);
       $json = "error";
-      if($session->get("isValid") == "true" && $template->getCreator() == $this->getDoctrine()->getRepository(User::class)->findOneById(intval($session->get("qui")))->getId())
+      if($session->get("isValid") == "true" && $template->getCreator() == $this->getDoctrine()->getRepository(User::class)->findOneById(intval($session->get("qui")))->getId() && ctype_digit($id))
       {
         $json = array();
         $children = $this->getDoctrine()->getRepository(Template::class)->findBy(['parent' => $id, 'creator' => $session->get('qui')]);
@@ -117,15 +117,8 @@ class TemplateController extends AbstractController
       if($verif > -1 && ctype_digit($id))
       {
         $json = array();
-        $em = $this->getDoctrine()->getManager();
-        $queryFiltre = $em->createQueryBuilder();
-        $queryFiltre->select('template');
-        $queryFiltre->from('App\Entity\Template','template');
-        $queryFiltre->where('template.parent = ?1')->setParameter(1,$id);
-        $queryFiltre->andWhere("template.creator = ?2")->setParameter(2,$user->getId());
 
-        // $children = $this->getDoctrine()->getRepository(Template::class)->findBy(array('parent' => $id, 'creator' => $user->getId()));
-        $children = $queryFiltre->getQuery()->getResult();
+        $children = $this->getDoctrine()->getRepository(Template::class)->findBy(['parent' => $id, 'creator' => $session->get('qui')]);
         foreach($children as $child)
         {
           $jsonTemp = $child->toJSON(); 
