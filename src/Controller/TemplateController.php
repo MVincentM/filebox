@@ -68,7 +68,7 @@ class TemplateController extends AbstractController
 
     $response = new JsonResponse();
 
-    $json = stripslashes(json_encode($res));
+    $json = stripslashes(json_encode($res."b"));
     $response = JsonResponse::fromJsonString($json);
 
     return $response;  
@@ -113,10 +113,18 @@ class TemplateController extends AbstractController
       $verif = $this->verifyAuthKey($authkey);
       $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['authkey' => $authkey]);
       $json = "error";
-      if($verif > -1)
+      if($verif > -1 && is_int($id))
       {
         $json = array();
-        $children = $this->getDoctrine()->getRepository(Template::class)->findBy(['parent' => $id, 'creator' => $user->getId()]);
+        $em = $this->getDoctrine()->getManager();
+        $queryFiltre = $em->createQueryBuilder();
+        $queryFiltre->select('template');
+        $queryFiltre->from('App\Entity\Template','template');
+        $queryFiltre->where('template.parent = ?1')->setParameter(1,$id);
+        $queryFiltre->andWhere("template.creator = ?2")->setParameter(2,$user->getId());
+
+        // $children = $this->getDoctrine()->getRepository(Template::class)->findBy(array('parent' => $id, 'creator' => $user->getId()));
+        $children = $queryFiltre->getQuery()->getResult();
         foreach($children as $child)
         {
           $jsonTemp = $child->toJSON(); 
