@@ -164,7 +164,9 @@ class TemplateController extends AbstractController
         $newTemplate->setName($nameFile);
         $newTemplate->setParent($res = $this->getDoctrine()->getRepository(Template::class)->findOneBy(['creator' => $user->getId(), 'parent' => NULL])->getId());
         $newTemplate->setPath($path);
-        $newTemplate->setLastUpdate(new \Datetime()->setTimestamp($dateModif));
+        $date = new DateTime();
+        $date->->setTimestamp($dateModif);
+        $newTemplate->setLastUpdate($date);
 
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($newTemplate);
