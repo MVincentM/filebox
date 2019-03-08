@@ -12,8 +12,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Template
 {
-    public function toJSON(){
+    public function toJSON($api){
         $type = get_class($this);
+        $lastUpdate = $this->getLastUpdate()->format("d/m/Y H:i");
+        if($api) $lastUpdate = $this->getLastUpdate()->getTimestamp();
         if($type == 'App\Entity\Folder') $type = "folder";
         else $type = "file";
         $json = array(
@@ -21,13 +23,14 @@ class Template
             'id' => $this->getId(),
             'path' => $this->getPath(),
             'name' => $this->getName(),
-            'lastUpdate' => $this->getLastUpdate()->format("d/m/Y H:i"),
+            'lastUpdate' => $lastUpdate,
             'lastUpdator' => $this->getLastModificator(),
             'creator' => $this->getCreator(),
         );
     
         return $json;
     }
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()

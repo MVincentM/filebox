@@ -86,7 +86,7 @@ class TemplateController extends AbstractController
         $children = $this->getDoctrine()->getRepository(Template::class)->findBy(['parent' => $id, 'creator' => $session->get('qui')]);
         foreach($children as $child)
         {
-          $jsonTemp = $child->toJSON(); 
+          $jsonTemp = $child->toJSON(false); 
           $jsonTemp["creator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["creator"])])->getUserName();
           $jsonTemp["lastUpdator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["lastUpdator"])])->getUserName();
           $json[] = $jsonTemp;
@@ -121,11 +121,95 @@ class TemplateController extends AbstractController
         $children = $this->getDoctrine()->getRepository(Template::class)->findBy(['creator' => $user->getId()]);
         foreach($children as $child)
         {
-          $jsonTemp = $child->toJSON(); 
+          $jsonTemp = $child->toJSON(true); 
           $jsonTemp["creator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["creator"])])->getUserName();
           $jsonTemp["lastUpdator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["lastUpdator"])])->getUserName();
           $json[] = $jsonTemp;
         }
+      }
+      $response = new JsonResponse();
+
+      // echo var_dump($json);
+      $json = stripslashes(json_encode($json));
+
+      // return new Response($json);
+      // return $this->json($json);
+      $response = JsonResponse::fromJsonString($json);
+
+      return $response;
+    }
+     /**
+       * @Route("/api/insert/template", name="api_insert_templates")
+       */
+     public function insertTemplateAPI(Request $request)
+     {
+      $authkey = $request->query->get("authkey");
+      $type = $request->query->get("type");
+      $nameFile = $request->query->get("nameFile");
+      $dateModif = $request->query->get("dateLastUpdate");
+      $path = $request->query->get("path");
+
+
+      $verif = $this->verifyAuthKey($authkey);
+      $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['authkey' => $authkey]);
+      $json = "error";
+
+      if($verif > -1)
+      {
+        $newTemplate;
+        if($type == "file") $newTemplate = new File();
+        else if($type == "folder") $newTemplate = new Template();
+        $newTemplate->setCreator($user->getId());
+        $newTemplate->setLastModificator($user->getId());
+        $newTemplate->setName($nameFile);
+        $newTemplate->setParent($this->getDoctrine()->getRepository(Template::class)->findOneBy(['creator' => $user->getId(), 'parent' => NULL])->getId());
+        $newTemplate->setPath($path);
+        $date = new DateTime();
+        $date->setTimestamp($dateModif);
+        $newTemplate->setLastUpdate($date);
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($newTemplate);
+        $entityManager->flush();
+
+        $json = $newTemplate->getId();
+      }
+      $response = new JsonResponse();
+
+      // echo var_dump($json);
+      $json = stripslashes(json_encode($json));
+
+      // return new Response($json);
+      // return $this->json($json);
+      $response = JsonResponse::fromJsonString($json);
+
+      return $response;
+    }
+     /**
+       * @Route("/api/update/template", name="api_update_templates")
+       */
+     public function updateTemplateAPI(Request $request)
+     {
+      $authkey = $request->query->get("authkey");
+      $dateModif = $request->query->get("dateLastUpdate");
+      $path = $request->query->get("path");
+
+      $verif = $this->verifyAuthKey($authkey);
+      $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['authkey' => $authkey]);
+      $json = "error";
+
+      if($verif > -1)
+      {
+        $date = new DateTime();
+        $date->setTimestamp($dateModif);
+        $template = $this->getDoctrine()->getRepository(Template::class)->findOneBy(['last_update' => $dateModif, 'path' => $path]);
+        $template->setLastUpdate($date);
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->remove($template);
+        $entityManager->flush();
+
+        $json = $template->getId();
       }
       $response = new JsonResponse();
 
