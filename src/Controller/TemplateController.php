@@ -139,7 +139,7 @@ class TemplateController extends AbstractController
       return $response;
     }
      /**
-       * @Route("/api/insert/template", name="api_get_templates")
+       * @Route("/api/insert/template", name="api_insert_templates")
        */
      public function insertTemplateAPI(Request $request)
      {
