@@ -154,7 +154,7 @@ class TemplateController extends AbstractController
       $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['authkey' => $authkey]);
       $json = "error";
 
-      if($verif > -1 && ctype_digit($id))
+      if($verif > -1)
       {
         $newTemplate;
         if($type == "file") $newTemplate = new File();
