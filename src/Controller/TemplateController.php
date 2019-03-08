@@ -208,7 +208,7 @@ class TemplateController extends AbstractController
         $template->setLastUpdate($date);
 
         $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($template);
+        // $entityManager->remove($template);
         $entityManager->flush();
 
         $json = $template->getId();
