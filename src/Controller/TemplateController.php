@@ -108,6 +108,7 @@ class TemplateController extends AbstractController
        */
      public function getTemplatesAPI($id, Request $request)
      {
+      $template =  $this->getDoctrine()->getRepository(Template::class)->findOneById($id);
       $authkey = $request->query->get("authkey");
       $verif = $this->verifyAuthKey($authkey);
       $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['authkey' => $authkey]);
@@ -142,8 +143,6 @@ class TemplateController extends AbstractController
        */
      public function insertTemplateAPI(Request $request)
      {
-      $template =  $this->getDoctrine()->getRepository(Template::class)->findOneById($id);
-
       $authkey = $request->query->get("authkey");
       $type = $request->query->get("type");
       $nameFile = $request->query->get("nameFile");
