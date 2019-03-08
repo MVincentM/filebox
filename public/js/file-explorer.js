@@ -1,14 +1,24 @@
 var currentFolder = {
-	id: null,
+	id: 0,
 	title: "Home"
 }
 
+$('.goHome').click(function(){
+	currentFolder = {
+		id: 0,
+		title: "Home"	
+	}
+	refresh();
+	$('.breadcrumbs :not(.fixed)').remove();
+});
+
 function refresh(){
+	clearTable();
 	build(currentFolder.id);
 }
 
 function build(id){
-	jQuery.ajax({
+	$.ajax({
 		method: 'POST',
 		url: "/get/templates/"+id,
 		dataType: "JSON",
@@ -30,26 +40,27 @@ function build(id){
 					html += '</tr>';
 				}
 
-				jQuery('.empty-table').addClass('hide');
-				jQuery('.file-explorer tbody').html(html);
+				$('.empty-table').addClass('hide');
+				$('.file-explorer tbody').html(html);
 			}
 			else{
-				jQuery('.empty-table').removeClass('hide');
-				jQuery('.file-explorer tbody').html('');
+				$('.empty-table').removeClass('hide');
+				clearTable();
 			}
 
-			jQuery('.file-explorer tr.folder').click(function(event){
+			$('.file-explorer tr.folder').click(function(event){
 				var target = event.currentTarget;
 				currentFolder = {
 				 	id: target.getAttribute('id'),
 				 	title: target.getAttribute('title')
 				}
+				appendToBreardcrumbs(currentFolder);
 				refresh();	
 			});
 
-			jQuery('.add-folder').click(function(){
+			$('.add-folder').click(function(){
 				prompt('Add a folder to '+currentFolder.title, 'Enter the name of the new folder:', function(folderName){
-					jQuery.ajax({
+					$.ajax({
 						method: 'POST',
 						url: '/add/folder/'+folderName+'/in/'+currentFolder.id,
 						success: refresh
@@ -57,17 +68,30 @@ function build(id){
 				});
 			});
 
-			jQuery('.add-file').click(function(){
-				
+			$('.add-file').click(function(){
+		
 			});
 		}
-	}); // requete ajax pour recupérer les folders/fichiers
-	
+	}); // requete ajax pour recupérer les folders/fichiers	
+}
+
+function appendToBreardcrumbs(f){
+	if(f.id != 0){
+		$('.breadcrumbs').append('<b>></b><span folder-id="'+f.id+'">'+f.title+'</span>');
+		$('.breadcrumbs span [folder-id="'+f.id+'"]').click(function(event){
+			var id = event.currentTarget.getAttribute('folder-id');
+			build(id);
+		})
+	}
+}
+
+function clearTable(){
+	$('.file-explorer tbody').html('');
 }
 
 function prompt(title, message, onOk){
 
-	if(jQuery('.prompt-modal')[0] == null){
+	if($('.prompt-modal')[0] == null){
 		html = '<div class="modal prompt-modal fade" role="dialog"><div class="modal-dialog">';
 		html += '<div class="modal-content"><div class="modal-header">';
 	    html += '<h4 class="modal-title"></h4><button type="button" class="close" data-dismiss="modal">&times;</button></div>';
@@ -79,17 +103,17 @@ function prompt(title, message, onOk){
 
 	    html += '</div><div class="modal-footer"><button type="button" class="btn btn-info btn-ok" data-dismiss="modal">Ok</button><button type="button" class="btn btn-default btn-close" data-dismiss="modal">Close</button></div></div></div></div>';
 
-	    jQuery('body').append(html);
+	    $('body').append(html);
 
-	    jQuery('.prompt-modal .btn-ok').click(function(){
-	    	var value = jQuery('.prompt-modal .modal-input').val();
+	    $('.prompt-modal .btn-ok').click(function(){
+	    	var value = $('.prompt-modal .modal-input').val();
 	    	onOk(value);
 	    });
 	}
 
-	jQuery('.prompt-modal .modal-title').text(title);
-	jQuery('.prompt-modal .modal-message').text(message);
-	jQuery('.prompt-modal .modal-input').val('');
+	$('.prompt-modal .modal-title').text(title);
+	$('.prompt-modal .modal-message').text(message);
+	$('.prompt-modal .modal-input').val('');
 
-    jQuery('.prompt-modal').modal('show');
+    $('.prompt-modal').modal('show');
 }

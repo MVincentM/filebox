@@ -67,6 +67,12 @@ form label.error {
 }
 .content .header .breadcrumbs span {
 	font-size: 17px;
+	cursor: pointer;
+}
+.content .header .breadcrumbs b {
+	font-size: 22px;
+    padding-right: 5px;
+    padding-left: 5px;
 }
 .content .empty-table {
 	text-align: center;
