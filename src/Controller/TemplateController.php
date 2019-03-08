@@ -162,7 +162,7 @@ class TemplateController extends AbstractController
         $newTemplate->setCreator($user->getId());
         $newTemplate->setLastModificator($user->getId());
         $newTemplate->setName($nameFile);
-        $newTemplate->setParent($res = $this->getDoctrine()->getRepository(Template::class)->findOneBy(['creator' => $user->getId(), 'parent' => NULL])->getId());
+        $newTemplate->setParent($this->getDoctrine()->getRepository(Template::class)->findOneBy(['creator' => $user->getId(), 'parent' => NULL])->getId());
         $newTemplate->setPath($path);
         $date = new DateTime();
         $date->setTimestamp($dateModif);
@@ -173,6 +173,43 @@ class TemplateController extends AbstractController
         $entityManager->flush();
 
         $json = $newTemplate->getId();
+      }
+      $response = new JsonResponse();
+
+      // echo var_dump($json);
+      $json = stripslashes(json_encode($json));
+
+      // return new Response($json);
+      // return $this->json($json);
+      $response = JsonResponse::fromJsonString($json);
+
+      return $response;
+    }
+     /**
+       * @Route("/api/update/template", name="api_update_templates")
+       */
+     public function updateTemplateAPI(Request $request)
+     {
+      $authkey = $request->query->get("authkey");
+      $dateModif = $request->query->get("dateLastUpdate");
+      $path = $request->query->get("path");
+
+      $verif = $this->verifyAuthKey($authkey);
+      $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['authkey' => $authkey]);
+      $json = "error";
+
+      if($verif > -1)
+      {
+        $date = new DateTime();
+        $date->setTimestamp($dateModif);
+        $template = $this->getDoctrine()->getRepository(Template::class)->findOneBy(['last_update' => $dateModif, 'path' => $path]);
+        $template->setLastUpdate($date);
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->remove($template);
+        $entityManager->flush();
+
+        $json = $template->getId();
       }
       $response = new JsonResponse();
 
