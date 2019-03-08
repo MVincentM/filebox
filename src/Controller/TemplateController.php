@@ -149,6 +149,8 @@ class TemplateController extends AbstractController
       $type = $request->query->get("type");
       $nameFile = $request->query->get("nameFile");
       $dateModif = $request->query->get("dateLastUpdate");
+      $path = $request->query->get("path");
+
 
       $verif = $this->verifyAuthKey($authkey);
       $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['authkey' => $authkey]);
@@ -163,7 +165,7 @@ class TemplateController extends AbstractController
         $newTemplate->setLastModificator($user->getId());
         $newTemplate->setName($nameFile);
         $newTemplate->setParent($res = $this->getDoctrine()->getRepository(Template::class)->findOneBy(['creator' => $user->getId(), 'parent' => NULL])->getId());
-        $newTemplate->setPath();
+        $newTemplate->setPath($path);
         $newTemplate->setLastUpdate($dateModif);
 
         $entityManager = $this->getDoctrine()->getManager();
