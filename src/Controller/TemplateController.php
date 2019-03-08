@@ -203,7 +203,6 @@ class TemplateController extends AbstractController
       {
         $date = new DateTime();
         $date->setTimestamp($dateModif);
-        echo $name." ".$path;
         $template = $this->getDoctrine()->getRepository(Template::class)->findOneBy(['name' => $name, 'path' => $path]);
         $template->setLastUpdate($date);
 
