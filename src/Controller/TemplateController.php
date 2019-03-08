@@ -193,6 +193,7 @@ class TemplateController extends AbstractController
       $authkey = $request->query->get("authkey");
       $dateModif = $request->query->get("dateLastUpdate");
       $path = $request->query->get("path");
+      $name = $request->query->get("nameFile");
 
       $verif = $this->verifyAuthKey($authkey);
       $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['authkey' => $authkey]);
@@ -202,7 +203,7 @@ class TemplateController extends AbstractController
       {
         $date = new DateTime();
         $date->setTimestamp($dateModif);
-        $template = $this->getDoctrine()->getRepository(Template::class)->findOneBy(['lastUpdate' => $date, 'path' => $path]);
+        $template = $this->getDoctrine()->getRepository(Template::class)->findOneBy(['name' => $name, 'path' => $path]);
         $template->setLastUpdate($date);
 
         $entityManager = $this->getDoctrine()->getManager();
