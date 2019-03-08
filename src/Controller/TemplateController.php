@@ -138,4 +138,49 @@ class TemplateController extends AbstractController
 
       return $response;
     }
+     /**
+       * @Route("/api/insert/template", name="api_get_templates")
+       */
+     public function insertTemplateAPI(Request $request)
+     {
+      $template =  $this->getDoctrine()->getRepository(Template::class)->findOneById($id);
+
+      $authkey = $request->query->get("authkey");
+      $type = $request->query->get("type");
+      $nameFile = $request->query->get("nameFile");
+      $dateModif = $request->query->get("dateLastUpdate");
+
+      $verif = $this->verifyAuthKey($authkey);
+      $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['authkey' => $authkey]);
+      $json = "error";
+
+      if($verif > -1 && ctype_digit($id))
+      {
+        $newTemplate;
+        if($type == "file") $newTemplate = new File();
+        else if($type == "folder") $newTemplate = new Template();
+        $newTemplate->setCreator($user->getId());
+        $newTemplate->setLastModificator($user->getId());
+        $newTemplate->setName($nameFile);
+        $newTemplate->setParent($res = $this->getDoctrine()->getRepository(Template::class)->findOneBy(['creator' => $user->getId(), 'parent' => NULL])->getId());
+        $newTemplate->setPath();
+        $newTemplate->setLastUpdate($dateModif);
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($newTemplate);
+        $entityManager->flush();
+
+        $json = $newTemplate->getId();
+      }
+      $response = new JsonResponse();
+
+      // echo var_dump($json);
+      $json = stripslashes(json_encode($json));
+
+      // return new Response($json);
+      // return $this->json($json);
+      $response = JsonResponse::fromJsonString($json);
+
+      return $response;
+    }
   }
