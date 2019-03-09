@@ -74,6 +74,9 @@ form label.error {
     padding-right: 5px;
     padding-left: 5px;
 }
+.content .file-explorer th img {
+	width: 24px;
+}
 .content .empty-table {
 	text-align: center;
 	font-style: italic;
