@@ -22,6 +22,9 @@ function build(id){
 		method: 'POST',
 		url: "/get/templates/"+id,
 		dataType: "JSON",
+		error: function(){
+			alert('danger', 'Fail to load the content of this folder.')
+		},
 		success: function(data){
 			var fs = data;
 
@@ -31,13 +34,16 @@ function build(id){
 					var f = fs[i];
 					var icon = '/icons/'+f.type+'.png';
 
-					html += '<tr class="'+f.type+'" id="'+f.id+'" title="'+f.name+'" path="'+f.path+f.name+'">';
+					html += '<tr class="'+f.type+'" id="'+f.id+'" name="'+f.name+'" path="'+f.path+f.name+'">';
 					html += '<th scope="row"><img src="'+icon+'"></th>';
 					html += '<td>'+ f.name +'</td>';
 					html += '<td>'+ f.lastUpdate +'</td>';
 					html += '<td>'+ (f.version ? f.version : '') +'</td>';
 					html += '<td>'+ f.lastUpdator +'</td>';
 					html += '<td>'+ f.creator +'</td>';
+					html += '<td><img title="Download" class="download" src="/icons/download.png">'
+								+'<img title="Rename" class="edit" src="/icons/edit.png">'
+								+'<img title="Delete" class="delete" src="/icons/delete.png"></td>';
 					html += '</tr>';
 				}
 
@@ -53,10 +59,55 @@ function build(id){
 				var target = event.currentTarget;
 				currentFolder = {
 				 	id: target.getAttribute('id'),
-				 	title: target.getAttribute('title')
+				 	title: target.getAttribute('name')
 				}
 				appendToBreardcrumbs(currentFolder);
 				refresh();	
+			});
+
+			$('img.download').click(function(event){
+				var tr = event.target.parentElement.parentElement;
+				window.open('/download/'+tr.id, '_blank');
+			});
+
+			$('img.edit').click(function(event){
+				var target = event.currentTarget.parentElement.parentElement;
+				var title = target.getAttribute('name');
+				var id = target.getAttribute('id');
+				prompt('File renaming','Rename file "'+title+'" to:', function(input, close){
+					$.ajax({
+						method: 'POST',
+						url: '/rename/'+id+'/by/'+input,
+						success: function(){
+							alert('success', '"'+title+'" has be renamed "'+input+'".');
+							close();
+							refresh();
+						},
+						error: function(){
+							alert('danger', 'Fail to rename "'+title+'".');
+							close();
+						}
+					})
+				});
+			});
+
+			$('img.delete').click(function(event){
+				var target = event.target.parentElement.parentElement;
+				var title = target.getAttribute('name');
+				var id = target.getAttribute('id');
+				$.ajax({
+					method: 'POST',
+					url: '/delete/'+id,
+					success: function(){
+						alert('success', '"'+title+'" has be deleted.');
+						close();
+						refresh();
+					},
+					error: function(){
+						alert('danger', 'Fail to delete "'+title+'".');
+						close();
+					}
+				})
 			});
 
 			$('.add-folder').click(function(){
@@ -65,8 +116,12 @@ function build(id){
 						method: 'POST',
 						url: '/add/folder/'+folderName+'/in/'+currentFolder.id,
 						success: function(){
+							alert('success', 'Folder successfully added.');
 							close();
 							refresh();
+						},
+						error: function(){
+							alert('danger', 'Fail to add folder.');
 						}
 					})
 				});
@@ -94,6 +149,17 @@ function build(id){
 
 					for(var i=0, c=files.length; i<c; i++)
 						form.append('file', files[0]);
+
+					xhr.onreadystatechange = function() {//Call a function when the state changes.
+					    if(xhr.readyState == 4){
+					    	if(xhr.status == 200) {
+					    		alert('success', 'File added successfully.');
+					    	}
+					    	else if(xhr.status == 404 || xhr.status == 500){
+					    		alert('danger', 'Fail to add file.');
+					    	}					        
+					    }
+					}
 
 					xhr.send(form);
 				});
@@ -129,15 +195,16 @@ function prompt(title, message, onOk){
 	    html += '<div class="modal-message"></div>'
 	    html += '<input class="form-control modal-input">';
 
-	    html += '</div><div class="modal-footer"><button type="button" class="btn btn-info btn-ok" data-dismiss="modal">Ok</button><button type="button" class="btn btn-default btn-close" data-dismiss="modal">Close</button></div></div></div></div>';
+	    html += '</div><div class="modal-footer"><button type="button" class="btn btn-info btn-ok">Ok</button><button type="button" class="btn btn-default btn-close" data-dismiss="modal">Close</button></div></div></div></div>';
 
 	    $('body').append(html);
 
 	    $('.prompt-modal .btn-ok').click(function(){
 	    	var value = $('.prompt-modal .modal-input').val();
-	    	onOk(value, function(){
-	    		$('.prompt-modal').modal('hide');
-	    	});
+		    if(value != '')
+		    	onOk(value, function(){
+		    		$('.prompt-modal').modal('hide');
+		    	});
 	    });
 	}
 
@@ -167,9 +234,10 @@ function askFiles(title, message, onOk){
 
 	    $('.askFiles-modal .btn-ok').click(function(){
 	    	var input = $('.askFiles-modal .modal-input')[0];
-	    	onOk(input.files, function(){
-	    		$('.askFiles-modal').modal('hide');
-	    	});
+	    	if(input.files.length > 0)
+		    	onOk(input.files, function(){
+		    		$('.askFiles-modal').modal('hide');
+		    	});
 	    });
 	}
 
@@ -178,4 +246,15 @@ function askFiles(title, message, onOk){
 	$('.askFiles-modal .modal-input').val('');
 
     $('.askFiles-modal').modal('show');
+}
+
+function alert(type, message){
+	$('.alerts').prepend('<div class="alert alert-'+type+'">'+message+'<strong>X</strong></div>');
+
+	var alerts = $('.alerts').children();
+	$(alerts[0]).find('strong').click(function(event){event.currentTarget.parentElement.remove()});
+
+	if(alerts.length > 5){
+		alerts[alerts.length-1].remove();
+	}
 }

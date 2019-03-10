@@ -77,6 +77,11 @@ form label.error {
 .content .file-explorer th img {
 	width: 24px;
 }
+.content .file-explorer td img {
+	width: 20px;
+	margin: 0 4px;
+	cursor: pointer;
+}
 .content .empty-table {
 	text-align: center;
 	font-style: italic;
@@ -91,6 +96,24 @@ form label.error {
 	width: 118px;
 	font-size: 24px;
 	cursor: default;
+}
+.main .root .top-bar .alerts{
+	position: absolute;
+    top: 0;
+    margin-left: 76px;
+    margin-top: 70px;
+    width: 100%;
+}
+.main .root .top-bar .alerts .alert{
+	margin-left: auto;
+	margin-right: auto;
+	width: 50%;
+	width: fit-content;
+}
+.main .root .top-bar .alerts .alert strong {
+    float: right;
+    cursor: pointer;
+    margin-left: 15px;
 }
 .main .root .navbar-collapse{
 	display: -ms-flexbox !important;
