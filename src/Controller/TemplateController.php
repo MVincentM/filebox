@@ -226,10 +226,13 @@ class TemplateController extends AbstractController
 
       if($session->get("isValid") == "true" && $template != null && $template->getCreator() == $user->getId())
       {
-        foreach($this->getDoctrine()->getRepository(Template::class)->findOneBy(['parent' => $id]) as $templ)
+        if($this->getDoctrine()->getRepository(Template::class)->findOneBy(['parent' => $id]) != null)
         {
-          $entityManager = $this->getDoctrine()->getManager();
-          $entityManager->remove($templ);
+          foreach($this->getDoctrine()->getRepository(Template::class)->findOneBy(['parent' => $id])->toArray() as $templ)
+          {
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->remove($templ);
+          }
         }
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($template);
