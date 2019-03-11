@@ -77,7 +77,7 @@ function build(id){
 				prompt('File renaming','Rename file "'+title+'" to:', function(input, close){
 					$.ajax({
 						method: 'POST',
-						url: '/rename/'+id+'/by/'+input,
+						url: '/rename/template?nameTemplate='+input+'&id='+id,
 						success: function(){
 							alert('success', '"'+title+'" has be renamed "'+input+'".');
 							close();
@@ -114,7 +114,7 @@ function build(id){
 				prompt('Add a folder to '+currentFolder.title, 'Enter the name of the new folder:', function(folderName, close){
 					$.ajax({
 						method: 'POST',
-						url: '/add/folder?nameForlder='+folderName+'&id='+currentFolder.id,
+						url: '/add/folder?nameFolder='+folderName+'&id='+currentFolder.id,
 						success: function(){
 							alert('success', 'Folder successfully added.');
 							close();

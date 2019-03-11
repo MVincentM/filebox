@@ -144,17 +144,18 @@ class TemplateController extends AbstractController
      public function addFolder(Session $session, Request $request)
      {
       $json = "error";
-      $nameForlder = $request->query->get("nameForlder");
+      $nameFolder = $request->query->get("nameFolder");
       $id = intval($request->query->get("id"));
 
       $user = $this->getDoctrine()->getRepository(User::class)->findOneById(intval($session->get("qui")));
 
       if($session->get("isValid") == "true")
       {
+        if($this->getDoctrine()->getRepository(Template::class)->findOneBy(['name' => $nameTemplate, 'creator' => $user->getId(), 'parent' => $template->getParent()]) != null) $nameFolder = $nameFolder." copy";
         $folder = new Folder();
         $folder->setCreator($user->getId());
         $folder->setLastModificator($user->getId());
-        $folder->setName($nameForlder);
+        $folder->setName($nameFolder);
         $templateParent = $this->getDoctrine()->getRepository(Template::class)->findOneById($id);
         $folder->setParent($id);
         $folder->setPath($templateParent->getPath());
@@ -165,6 +166,39 @@ class TemplateController extends AbstractController
         $entityManager->persist($folder);
         $entityManager->flush();
         $json = $folder->getId();
+        
+      }
+      $response = new JsonResponse();
+
+      // echo var_dump($json);
+      $json = stripslashes(json_encode($json));
+
+      // return new Response($json);
+      // return $this->json($json);
+      $response = JsonResponse::fromJsonString($json);
+
+      return $response;
+    }
+     /**
+       * @Route("/rename/template", name="rename_template")
+       */
+     public function renameTemplate(Session $session, Request $request)
+     {
+      $json = "error";
+      $nameTemplate = $request->query->get("nameTemplate");
+      $id = intval($request->query->get("id"));
+
+      $user = $this->getDoctrine()->getRepository(User::class)->findOneById(intval($session->get("qui")));
+      $template = $this->getDoctrine()->getRepository(Template::class)->findOneById($id);
+
+      if($session->get("isValid") == "true" && $template != null)
+      {
+        if($this->getDoctrine()->getRepository(Template::class)->findOneBy(['name' => $nameTemplate, 'creator' => $user->getId(), 'parent' => $template->getParent()]) != null) $nameTemplate = $nameTemplate." copy";
+        $template->setName($nameTemplate);
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->flush();
+        $json = $template->getId();
         
       }
       $response = new JsonResponse();
