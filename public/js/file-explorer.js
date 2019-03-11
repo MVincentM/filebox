@@ -12,6 +12,61 @@ $('.goHome').click(function(){
 	$('.breadcrumbs :not(.fixed)').remove();
 });
 
+$('.add-folder').click(function(){
+	prompt('Add a folder to '+currentFolder.title, 'Enter the name of the new folder:', function(folderName, close){
+		$.ajax({
+			method: 'POST',
+			url: '/add/folder?nameFolder='+folderName+'&id='+currentFolder.id,
+			success: function(){
+				alert('success', 'Folder successfully added.');
+				close();
+				refresh();
+			},
+			error: function(){
+				alert('danger', 'Fail to add folder.');
+				close();
+			}
+		})
+	});
+});
+
+$('.add-file').click(function(){
+	askFiles('Add a file to '+currentFolder.title, null, function(files, close){
+		var xhr = new XMLHttpRequest();
+		var progress = document.getElementById('file-upload-progress');
+		$(progress).removeClass('hide');
+
+		xhr.open('POST', '/add/files/in/'+currentFolder.id);
+
+		xhr.upload.addEventListener('progress', function(e) {
+			progress.value = e.loaded;
+			progress.max = e.total;
+		});
+
+		xhr.addEventListener('load', function() {
+			close();
+			refresh();
+		});
+
+		var form = new FormData();
+
+		for(var i=0, c=files.length; i<c; i++)
+			form.append('file', files[0]);
+
+		xhr.onreadystatechange = function() {//Call a function when the state changes.
+			if(xhr.readyState == 4){
+				if(xhr.status == 200) {
+					alert('success', 'File added successfully.');
+				}
+				else if(xhr.status == 404 || xhr.status == 500){
+					alert('danger', 'Fail to add file.');
+				}					        
+			}
+		}
+		xhr.send(form);
+	});
+});
+
 function refresh(){
 	clearTable();
 	build(currentFolder.id);
@@ -109,63 +164,8 @@ function build(id){
 					}
 				})
 			});
-
-			$('.add-folder').click(function(){
-				prompt('Add a folder to '+currentFolder.title, 'Enter the name of the new folder:', function(folderName, close){
-					$.ajax({
-						method: 'POST',
-						url: '/add/folder?nameFolder='+folderName+'&id='+currentFolder.id,
-						success: function(){
-							alert('success', 'Folder successfully added.');
-							close();
-							refresh();
-						},
-						error: function(){
-							alert('danger', 'Fail to add folder.');
-						}
-					})
-				});
-			});
-
-			$('.add-file').click(function(){
-				askFiles('Add a file to '+currentFolder.title, null, function(files, close){
-					var xhr = new XMLHttpRequest();
-					var progress = document.getElementById('file-upload-progress');
-					$(progress).removeClass('hide');
-
-					xhr.open('POST', '/add/files/in/'+currentFolder.id);
-
-					xhr.upload.addEventListener('progress', function(e) {
-						progress.value = e.loaded;
-						progress.max = e.total;
-					});
-
-					xhr.addEventListener('load', function() {
-						close();
-						refresh();
-					});
-
-					var form = new FormData();
-
-					for(var i=0, c=files.length; i<c; i++)
-						form.append('file', files[0]);
-
-					xhr.onreadystatechange = function() {//Call a function when the state changes.
-					    if(xhr.readyState == 4){
-					    	if(xhr.status == 200) {
-					    		alert('success', 'File added successfully.');
-					    	}
-					    	else if(xhr.status == 404 || xhr.status == 500){
-					    		alert('danger', 'Fail to add file.');
-					    	}					        
-					    }
-					}
-
-					xhr.send(form);
-				});
-			});
 		}
-	}); // requete ajax pour recupérer les folders/fichiers	
+	});
 }
 
 function appendToBreardcrumbs(f){
@@ -185,28 +185,28 @@ function clearTable(){
 
 function prompt(title, message, onOk){
 
-	if($('.prompt-modal')[0] == null){
-		html = '<div class="modal prompt-modal fade" role="dialog"><div class="modal-dialog">';
-		html += '<div class="modal-content"><div class="modal-header">';
-	    html += '<h4 class="modal-title"></h4><button type="button" class="close" data-dismiss="modal">&times;</button></div>';
-	    html += '<div class="modal-body">';
+	$('.prompt-modal').remove();
 
-	    // Body
-	    html += '<div class="modal-message"></div>'
-	    html += '<input class="form-control modal-input">';
+	html = '<div class="modal prompt-modal fade" role="dialog"><div class="modal-dialog">';
+	html += '<div class="modal-content"><div class="modal-header">';
+	html += '<h4 class="modal-title"></h4><button type="button" class="close" data-dismiss="modal">&times;</button></div>';
+	html += '<div class="modal-body">';
 
-	    html += '</div><div class="modal-footer"><button type="button" class="btn btn-info btn-ok">Ok</button><button type="button" class="btn btn-default btn-close" data-dismiss="modal">Close</button></div></div></div></div>';
+	// Body
+	html += '<div class="modal-message"></div>'
+	html += '<input class="form-control modal-input">';
 
-	    $('body').append(html);
+	html += '</div><div class="modal-footer"><button type="button" class="btn btn-info btn-ok">Ok</button><button type="button" class="btn btn-default btn-close" data-dismiss="modal">Close</button></div></div></div></div>';
 
-	    $('.prompt-modal .btn-ok').click(function(){
-	    	var value = $('.prompt-modal .modal-input').val();
-		    if(value != '')
-		    	onOk(value, function(){
-		    		$('.prompt-modal').modal('hide');
-		    	});
-	    });
-	}
+	$('body').append(html);
+
+	$('.prompt-modal .btn-ok').click(function(){
+		var value = $('.prompt-modal .modal-input').val();
+		if(value != '')
+			onOk(value, function(){
+				$('.prompt-modal').modal('hide');
+			});
+	});
 
 	$('.prompt-modal .modal-title').text(title);
 	$('.prompt-modal .modal-message').text(message);
@@ -217,29 +217,29 @@ function prompt(title, message, onOk){
 
 function askFiles(title, message, onOk){
 
-	if($('.askFiles-modal')[0] == null){
-		html = '<div class="modal askFiles-modal fade" role="dialog"><div class="modal-dialog">';
-		html += '<div class="modal-content"><div class="modal-header">';
-	    html += '<h4 class="modal-title"></h4><button type="button" class="close" data-dismiss="modal">&times;</button></div>';
-	    html += '<div class="modal-body">';
+	$('.askFiles-modal').remove();
 
-	    // Body
-	    html += '<div class="modal-message"></div>'
-	    html += '<input class="modal-input" type="file" multiple />';
-	    html += '<progress id="file-upload-progress" class="hide"></progress>';
+	html = '<div class="modal askFiles-modal fade" role="dialog"><div class="modal-dialog">';
+	html += '<div class="modal-content"><div class="modal-header">';
+	html += '<h4 class="modal-title"></h4><button type="button" class="close" data-dismiss="modal">&times;</button></div>';
+	html += '<div class="modal-body">';
 
-	    html += '</div><div class="modal-footer"><button type="button" class="btn btn-info btn-ok">Ok</button><button type="button" class="btn btn-default btn-close" data-dismiss="modal">Close</button></div></div></div></div>';
+	// Body
+	html += '<div class="modal-message"></div>'
+	html += '<input class="modal-input" type="file" multiple />';
+	html += '<progress id="file-upload-progress" class="hide"></progress>';
 
-	    $('body').append(html);
+	html += '</div><div class="modal-footer"><button type="button" class="btn btn-info btn-ok">Ok</button><button type="button" class="btn btn-default btn-close" data-dismiss="modal">Close</button></div></div></div></div>';
 
-	    $('.askFiles-modal .btn-ok').click(function(){
-	    	var input = $('.askFiles-modal .modal-input')[0];
-	    	if(input.files.length > 0)
-		    	onOk(input.files, function(){
-		    		$('.askFiles-modal').modal('hide');
-		    	});
-	    });
-	}
+	$('body').append(html);
+
+	$('.askFiles-modal .btn-ok').click(function(){
+		var input = $('.askFiles-modal .modal-input')[0];
+		if(input.files.length > 0)
+			onOk(input.files, function(){
+				$('.askFiles-modal').modal('hide');
+			});
+	});
 
 	$('.askFiles-modal .modal-title').text(title);
 	$('.askFiles-modal .modal-message').text(message);
