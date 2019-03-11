@@ -97,7 +97,7 @@ function build(id){
 				var id = target.getAttribute('id');
 				$.ajax({
 					method: 'POST',
-					url: '/delete/'+id,
+					url: '/delete/template/'+id,
 					success: function(){
 						alert('success', '"'+title+'" has be deleted.');
 						close();
