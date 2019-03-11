@@ -121,11 +121,13 @@ function build(id){
 			});
 
 			$('img.download').click(function(event){
+				event.stopPropagation();
 				var tr = event.target.parentElement.parentElement;
 				window.open('/download/'+tr.id, '_blank');
 			});
 
 			$('img.edit').click(function(event){
+				event.stopPropagation();
 				var target = event.currentTarget.parentElement.parentElement;
 				var title = target.getAttribute('name');
 				var id = target.getAttribute('id');
@@ -147,6 +149,7 @@ function build(id){
 			});
 
 			$('img.delete').click(function(event){
+				event.stopPropagation();
 				var target = event.target.parentElement.parentElement;
 				var title = target.getAttribute('name');
 				var id = target.getAttribute('id');
@@ -173,8 +176,14 @@ function appendToBreardcrumbs(f){
 		$('.breadcrumbs').append('<b>></b><span folder-id="'+f.id+'">'+f.title+'</span>');
 		$('.breadcrumbs span[folder-id="'+f.id+'"]').click(function(event){
 			var id = event.currentTarget.getAttribute('folder-id');
-			if(id != currentFolder.id)
+			if(id != currentFolder.id){
+				while(true){
+					var next = $(event.currentTarget).next();
+					if(next.length) next.remove();
+					else break;
+				}
 				build(id);
+			}
 		})
 	}
 }
