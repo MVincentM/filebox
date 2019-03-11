@@ -114,7 +114,7 @@ function build(id){
 				prompt('Add a folder to '+currentFolder.title, 'Enter the name of the new folder:', function(folderName, close){
 					$.ajax({
 						method: 'POST',
-						url: '/add/folder/'+folderName+'/in/'+currentFolder.id,
+						url: '/add/folder?nameForlder='+folderName+'&id='+currentFolder.id,
 						success: function(){
 							alert('success', 'Folder successfully added.');
 							close();

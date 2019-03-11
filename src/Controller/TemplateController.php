@@ -139,6 +139,46 @@ class TemplateController extends AbstractController
       return $response;
     }
      /**
+       * @Route("/add/folder", name="api_add_folder")
+       */
+     public function addFolder(Session $session, Request $request)
+     {
+      $json = "error";
+      $nameForlder = $request->query->get("nameForlder");
+      $id = intval($request->query->get("id"));
+
+      $user = $this->getDoctrine()->getRepository(User::class)->findOneById(intval($session->get("qui")));
+
+      if($session->get("isValid") == "true")
+      {
+        $folder = new Folder();
+        $folder->setCreator($user->getId());
+        $folder->setLastModificator($user->getId());
+        $folder->setName($nameForlder);
+        $templateParent = $this->getDoctrine()->getRepository(Template::class)->findOneById($id);
+        $folder->setParent($id);
+        $folder->setPath($templateParent->getPath());
+        $date = new DateTime();
+        $folder->setLastUpdate($date);
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($folder);
+        $entityManager->flush();
+        $json = $folder->getId();
+        
+      }
+      $response = new JsonResponse();
+
+      // echo var_dump($json);
+      $json = stripslashes(json_encode($json));
+
+      // return new Response($json);
+      // return $this->json($json);
+      $response = JsonResponse::fromJsonString($json);
+
+      return $response;
+    }
+     /**
        * @Route("/api/insert/template", name="api_insert_templates")
        */
      public function insertTemplateAPI(Request $request)
