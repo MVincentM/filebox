@@ -412,7 +412,7 @@ class TemplateController extends AbstractController
       $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['authkey' => $authkey]);
       $json = "error";
 
-      if($verif > -1 && ctype_digit($id))
+      if($verif > -1)
       {
         $template = $this->getDoctrine()->getRepository(Template::class)->findOneBy(['name' => $name, 'path' => $path]);
         $json = $template->getId();
