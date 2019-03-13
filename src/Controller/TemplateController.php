@@ -399,4 +399,33 @@ class TemplateController extends AbstractController
 
       return $response;
     }
+     /**
+       * @Route("/api/get/id/template", name="api_getid_template")
+       */
+     public function getIdTemplateAPI(Request $request)
+     {
+      $authkey = $request->query->get("authkey");
+      $path = $request->query->get("path");
+      $name = $request->query->get("nameFile");
+
+      $verif = $this->verifyAuthKey($authkey);
+      $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['authkey' => $authkey]);
+      $json = "error";
+
+      if($verif > -1 && ctype_digit($id))
+      {
+        $template = $this->getDoctrine()->getRepository(Template::class)->findOneBy(['name' => $name, 'path' => $path]);
+        $json = $template->getId();
+      }
+      $response = new JsonResponse();
+
+      // echo var_dump($json);
+      $json = stripslashes(json_encode($json));
+
+      // return new Response($json);
+      // return $this->json($json);
+      $response = JsonResponse::fromJsonString($json);
+
+      return $response;
+    }
   }
