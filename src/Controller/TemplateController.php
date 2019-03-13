@@ -169,6 +169,7 @@ class TemplateController extends AbstractController
           $entityManager->flush();
           $json = $folder->getId();
         }
+        else $json = "already";
       }
       $response = new JsonResponse();
 
@@ -195,12 +196,15 @@ class TemplateController extends AbstractController
 
       if($session->get("isValid") == "true" && $template != null && $template->getCreator() == $user->getId())
       {
-        if($this->getDoctrine()->getRepository(Template::class)->findOneBy(['name' => $nameTemplate, 'creator' => $user->getId(), 'parent' => $template->getParent()]) != null) $nameTemplate = $nameTemplate." bis";
-        $template->setName($nameTemplate);
+        if($this->getDoctrine()->getRepository(Template::class)->findOneBy(['name' => $nameTemplate, 'creator' => $user->getId(), 'parent' => $template->getId()]) == null) 
+        {  
+          $template->setName($nameTemplate);
 
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->flush();
-        $json = $template->getId();
+          $entityManager = $this->getDoctrine()->getManager();
+          $entityManager->flush();
+          $json = $template->getId();
+        }
+        else $json = "already";
         
       }
       $response = new JsonResponse();
@@ -226,19 +230,78 @@ class TemplateController extends AbstractController
 
       if($session->get("isValid") == "true" && $template != null && $template->getCreator() == $user->getId())
       {
-        if($this->getDoctrine()->getRepository(Template::class)->findOneBy(['parent' => $id]) != null)
-        {
-          foreach($this->getDoctrine()->getRepository(Template::class)->findOneBy(['parent' => $id])->toArray() as $templ)
+        $children = $this->getDoctrine()->getRepository(Template::class)->findBy(['parent' => $id]);
+        $entityManager = $this->getDoctrine()->getManager();
+
+        if($children != null)
+        { 
+          foreach($children as $templ)
           {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($templ);
           }
+
         }
-        $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($template);
         $entityManager->flush();
         $json = "done";
         
+      }
+      $response = new JsonResponse();
+
+      // echo var_dump($json);
+      $json = stripslashes(json_encode($json));
+
+      // return new Response($json);
+      // return $this->json($json);
+      $response = JsonResponse::fromJsonString($json);
+
+      return $response;
+    }
+     /**
+       * @Route("/add/files/in/{id}", name="add_files")
+       */
+     public function addFiles($id, Session $session, Request $request)
+     {
+      $json = "error";
+      $template = $this->getDoctrine()->getRepository(Template::class)->findOneById($id);
+      $user = $this->getDoctrine()->getRepository(User::class)->findOneById(intval($session->get("qui")));
+      $fileName = $_FILES["file"]["name"];
+
+      if($session->get("isValid") == "true" && $this->getDoctrine()->getRepository(Template::class)->findOneBy(['name' => $fileName, 'creator' => $user->getId(), 'parent' => $template->getId()]) == null)
+      {
+        $newTemplate = new File();
+        $newTemplate->setCreator($user->getId());
+        $newTemplate->setLastModificator($user->getId());
+        $newTemplate->setName($fileName);
+        $newTemplate->setParent($this->getDoctrine()->getRepository(Template::class)->findOneBy(['creator' => $user->getId(), 'parent' => NULL])->getId());
+        $newTemplate->setPath($template->getPath());
+        $date = new DateTime();
+        $newTemplate->setLastUpdate($date);
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($newTemplate);
+        $entityManager->flush();
+        $json = "bddok";
+        
+      }
+      if($json == "bddok")
+      {
+        $json = "uploadFailed";
+        $repertoireDestination = "serveurTemplates/";
+        if (is_uploaded_file($_FILES["file"]["tmp_name"])) {
+            if (move_uploaded_file($_FILES["file"]["tmp_name"],$repertoireDestination.$fileName)) {
+                echo "Le fichier temporaire ".$_FILES["file"]["tmp_name"].
+                        " a ete deplace vers ".$repertoireDestination.$fileName;
+                        $json = "done";
+                        // chmod($repertoireDestination.$fileName, 0644);
+                          // header("Location: http:/localhost:8000");
+            } else {
+                echo "Le déplacement du fichier temporaire a échoué".
+                        " verifiez lexistence du repertoire ".$repertoireDestination;
+            }          
+        } else {
+            echo "Le fichier na pas ete uploade (trop gros ?)";
+        }
       }
       $response = new JsonResponse();
 
@@ -271,7 +334,7 @@ class TemplateController extends AbstractController
       {
         $newTemplate;
         if($type == "file") $newTemplate = new File();
-        else if($type == "folder") $newTemplate = new Template();
+        else if($type == "folder") $newTemplate = new Folder();
         $newTemplate->setCreator($user->getId());
         $newTemplate->setLastModificator($user->getId());
         $newTemplate->setName($nameFile);
