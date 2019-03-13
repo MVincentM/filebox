@@ -1,14 +1,17 @@
-var currentFolder = {
-	id: 0,
-	title: "Home"
-}
+var HOME_ID;
+var currentFolder = {}
 
-$('.goHome').click(function(){
+function init(homeID){
+	if(homeID !== undefined) HOME_ID = homeID;
 	currentFolder = {
-		id: 0,
+		id: HOME_ID,
 		title: "Home"	
 	}
 	refresh();
+}
+
+$('.goHome').click(function(){
+	init();
 	$('.breadcrumbs :not(.fixed)').remove();
 });
 
@@ -266,4 +269,53 @@ function alert(type, message){
 	if(alerts.length > 5){
 		alerts[alerts.length-1].remove();
 	}
+}
+
+function askUserAccess(id, title, message, onOk){
+
+	$('.useraccess-modal').remove();
+
+	html = '<div class="modal useraccess-modal fade" role="dialog"><div class="modal-dialog">';
+	html += '<div class="modal-content"><div class="modal-header">';
+	html += '<h4 class="modal-title"></h4><button type="button" class="close" data-dismiss="modal">&times;</button></div>';
+	html += '<div class="modal-body">';
+
+	// Body
+	html += '<div class="modal-message"></div>'
+	html += '<input class="form-control modal-input"><button class="btn-add-user">Add user</button>';
+	html += '<div class="user-list"></div>';
+
+	html += '</div><div class="modal-footer"><button class="btn btn-default btn-close" data-dismiss="modal">Close</button></div></div></div></div>';
+
+	$('body').append(html);
+
+	$('.useraccess-modal .btn-ok').click(function(){
+		var value = $('.useraccess-modal .modal-input').val();
+		if(value != '')
+			onOk(value, function(){
+				$('.useraccess-modal').modal('hide');
+			});
+	});
+
+	$('.useraccess-modal .modal-title').text(title);
+	$('.useraccess-modal .modal-message').text(message);
+	$('.useraccess-modal .modal-input').val('');
+
+	$.ajax({
+		method: 'POST',
+		url: '/getUserAccess/'+id,
+		success: function(users){
+			var html = '';
+			for(var i=0; i<users.length; i++){
+				html += '<div class="user" title="'+user.email+'">'+user.firstName+' '+user.lastName+'<img title="Delete" class="delete" src="/icons/delete.png"></td></div>';
+			}
+			$('.useraccess-modal .user-list').html(html);
+		},
+		error: function(){
+			alert('danger', 'Fail to rename "'+title+'".');
+			close();
+		}
+	})
+
+    $('.useraccess-modal').modal('show');
 }
