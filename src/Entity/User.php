@@ -14,6 +14,14 @@ class User
         return $name;
     }
 
+    public function getUserShare(){
+        $json = array(
+            'name' => $this->getPrenom()." ".$this->getNom(),
+            'email' => $this->getMail(),
+            'id' => $this->getId()
+        );
+        return $name;
+    }
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
