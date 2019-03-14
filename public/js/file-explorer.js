@@ -312,28 +312,65 @@ function askUserAccess(id, name, onOk){
 	$('.useraccess-modal .modal-message').text("Enter the user you want to give access to \""+name+"\"");
 	$('.useraccess-modal .modal-input').val('');
 
-	autocomplete($('.useraccess-modal .autocomplete input')[0], ['bibi','momo','dada','riri','bibo','dadon']);
+	function fetchUserList(){
+		$.ajax({
+			method: 'POST',
+			url: '/getUserAccess/'+id,
+			success: function(users){
+				var html = '';
+				for(var i=0; i<users.length; i++){
+					html += '<div class="user" title="'+user.email+'" id="'+user.id+'">'+user.firstName+' '+user.lastName+'<img title="Delete" class="delete" src="/icons/delete.png"></div>';
+				}
+				$('.useraccess-modal .user-list').html(html);
 
-	$.ajax({
-		method: 'POST',
-		url: '/getUserAccess/'+id,
-		success: function(users){
-			var html = '';
-			for(var i=0; i<users.length; i++){
-				html += '<div class="user" title="'+user.email+'">'+user.firstName+' '+user.lastName+'<img title="Delete" class="delete" src="/icons/delete.png"></td></div>';
+				$('.useraccess-modal .user-list .delete').click(function(event){
+					var target = event.currentTarget.parentElement;
+					onDeleteUser(target.id);
+				});
+			},
+			error: function(){
+				alert('danger', 'Fail to get users.');
+				close();
 			}
-			$('.useraccess-modal .user-list').html(html);
-		},
-		error: function(){
-			alert('danger', 'Fail to rename "'+title+'".');
-			close();
-		}
-	})
+		})
+	}
+
+	onSelectUser = function(userID){
+		$.ajax({
+			method: 'POST',
+			url: '/addUser/'+userID+'/to/'+id,
+			success: function(){
+				alert('success', 'New user has been added to '+name);
+				fetchUserList();
+			},
+			error: function(){
+				alert('success', 'Fail to add user to '+name);
+				close();
+			}
+		})
+	}
+
+	onDeleteUser = function(userID){
+		$.ajax({
+			method: 'POST',
+			url: '/removeUser/'+userID+'/from/'+id,
+			success: function(){
+				alert('success', 'User has been deleted from '+name);
+				fetchUserList();
+			},
+			error: function(){
+				alert('success', 'Fail to delete user from '+name);
+				close();
+			}
+		})
+	}
+
+	autocomplete($('.useraccess-modal .autocomplete input')[0], onSelectUser);
 
     $('.useraccess-modal').modal('show');
 }
 
-function autocomplete(inp, arr) {
+function autocomplete(inp, onSelect) {
   /*the autocomplete function takes two arguments,
   the text field element and an array of possible autocompleted values:*/
   var currentFocus;
@@ -380,28 +417,28 @@ function autocomplete(inp, arr) {
       	method: 'POST',
 		url: '/search/'+val,
 		success: function(users){
-			for(var i=0; i<users.length; i++){
+			for(let i=0; i<users.length; i++){
 			  // create a DIV element for each matching element:
 	          b = document.createElement("DIV");
 	          // make the matching letters bold:
-	          b.innerHTML = "<strong>" + users[i].substr(0, val.length) + "</strong>";
-	          b.innerHTML += users[i].substr(val.length);
+	          b.innerHTML = "<strong>" + users[i].name.substr(0, val.length) + "</strong>";
+	          b.innerHTML += users[i].name.substr(val.length);
 	          // insert a input field that will hold the current array item's value:
-	          b.innerHTML += "<input type='hidden' value='" + users[i] + "'>";
+	          b.innerHTML += "<input type='hidden' value='" + users[i].name + "'>";
 	          // execute a function when someone clicks on the item value (DIV element):
 	          b.addEventListener("click", function(e) {
-	              // insert the value for the autocomplete text field:
-	              inp.value = this.getElementsByTagName("input")[0].value;
+	          	  // reset iput
+	              inp.value = '';
 	              // close the list of autocompleted values, (or any other open lists of autocompleted values:
 	              closeAllLists();
-
-	              // TODO : appel ajax pour ajouter l'utilisateur
+	              // callback
+	              onSelect(users[i].id);
 	          });
 	          a.appendChild(b);
 	        }
 		},
 		error: function(){
-			var users = ['error1','error2','error3','error4'];
+			var users = ['No users','enfin si peut etre','le truc c\'est que','y\a pas d\'api', 'lol'];
 			for(var i=0; i<users.length; i++){
 			  // create a DIV element for each matching element:
 	          b = document.createElement("DIV");
@@ -412,10 +449,12 @@ function autocomplete(inp, arr) {
 	          b.innerHTML += "<input type='hidden' value='" + users[i] + "'>";
 	          // execute a function when someone clicks on the item value (DIV element):
 	          b.addEventListener("click", function(e) {
-	              // insert the value for the autocomplete text field:
-	              inp.value = this.getElementsByTagName("input")[0].value;
+	          	  // reset iput
+	              inp.value = '';
 	              // close the list of autocompleted values, (or any other open lists of autocompleted values:
 	              closeAllLists();
+	              // callback
+	              onSelect(users[i]);
 	          });
 	          a.appendChild(b);
 	        }
