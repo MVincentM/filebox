@@ -49,15 +49,15 @@ class User
      */
     private $mdp;
     /**
-     * @ORM\Column(type="string", length=15)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $authkey;
     /**
-     * @ORM\Column(type="string", length=15)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $ip;
     /**
-     * @ORM\Column(type="datetime", length=15)
+     * @ORM\Column(type="datetime", nullable=true)
      */
     private $dateKey; 
 

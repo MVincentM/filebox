@@ -14,6 +14,7 @@ use App\Entity\File;
 use App\Entity\Folder;
 use App\Entity\Template;
 use App\Entity\User;
+use App\Entity\Share;
 use \Datetime;
 
 class TemplateController extends AbstractController
@@ -91,6 +92,18 @@ class TemplateController extends AbstractController
           $jsonTemp["lastUpdator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["lastUpdator"])])->getUserName();
           $json[] = $jsonTemp;
         }
+
+        $share = $this->getDoctrine()->getRepository(Share::class)->findBy(['idUser' => $session->get("qui")]);
+        foreach($share as $val)
+        {
+          $temp = $this->getDoctrine()->getRepository(Template::class)->findOneById($val->getIdTemplate());
+          $jsonTemp = $temp->toJSON(false); 
+          $jsonTemp["creator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["creator"])])->getUserName();
+          $jsonTemp["lastUpdator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["lastUpdator"])])->getUserName();
+          $json[] = $jsonTemp;
+        }
+
+
       }
       $response = new JsonResponse();
 
