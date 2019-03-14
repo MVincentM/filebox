@@ -446,20 +446,48 @@ class TemplateController extends AbstractController
       */
     public function downloadTemplate(Request $request, $id)
     {
+      $json = "error";
       $fileId = $request->request->get("fileId");
       $file = $this->getDoctrine()->getRepository(Template::class)->findOneById($id);
-      if (($file != "") && (file_exists("/serveurTemplates/" . basename($file))))
+      $fileShared = $this->getDoctrine()->getRepository(Share::class)->findOneBy(['idTemplate' => $id]);
+      if($file != null)
       {
-        $size = filesize("php/files/" . basename($file));
-        header("Content-Type: application/force-download; name=\"" . basename($file) . "\"");
-        header("Content-Transfer-Encoding: binary");
-        header("Content-Length: $size");
-        header("Content-Disposition: attachment; filename=\"" . basename($file) . "\"");
-        header("Expires: 0");
-        header("Cache-Control: no-cache, must-revalidate");
-        header("Pragma: no-cache");
-        readfile("php/files/" . basename($file));
-        exit();
+        $json = "ok";
+
+        if (file_exists("/serveurTemplates/" . basename($file->getName())) && $file->getCreator() == intval($session->get("qui")) )
+        {
+          $size = filesize("php/files/" . basename($file));
+          header("Content-Type: application/force-download; name=\"" . basename($file) . "\"");
+          header("Content-Transfer-Encoding: binary");
+          header("Content-Length: $size");
+          header("Content-Disposition: attachment; filename=\"" . basename($file) . "\"");
+          header("Expires: 0");
+          header("Cache-Control: no-cache, must-revalidate");
+          header("Pragma: no-cache");
+          readfile("php/files/" . basename($file));
+          exit();
+        }
       }
+      else if($fileShared != null)
+      {
+        $json = "ok";
+        if (file_exists("/serveurTemplates/" . basename($fileShared->getName())) && $fileShared->getIdUser() == intval($session->get("qui")))
+        {
+          $size = filesize("php/files/" . basename($fileShared));
+          header("Content-Type: application/force-download; name=\"" . basename($fileShared) . "\"");
+          header("Content-Transfer-Encoding: binary");
+          header("Content-Length: $size");
+          header("Content-Disposition: attachment; filename=\"" . basename($fileShared) . "\"");
+          header("Expires: 0");
+          header("Cache-Control: no-cache, must-revalidate");
+          header("Pragma: no-cache");
+          readfile("php/files/" . basename($fileShared));
+          exit();
+        }
+      }
+      $response = new JsonResponse();
+      $json = stripslashes(json_encode($json));
+      $response = JsonResponse::fromJsonString($json);
+      return $response;
     }
   }

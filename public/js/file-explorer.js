@@ -127,7 +127,7 @@ function build(id){
 			$('img.download').click(function(event){
 				event.stopPropagation();
 				var tr = event.target.parentElement.parentElement;
-				window.open('/download/'+tr.id, '_blank');
+				window.open('/download/template/'+tr.id, '_blank');
 			});
 
 			$('img.edit').click(function(event){
