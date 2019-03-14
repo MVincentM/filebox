@@ -319,7 +319,7 @@ function askUserAccess(id, name, onOk){
 			success: function(users){
 				var html = '';
 				for(var i=0; i<users.length; i++){
-					html += '<div class="user" title="'+user.email+'" id="'+user.id+'">'+user.firstName+' '+user.lastName+'<img title="Delete" class="delete" src="/icons/delete.png"></div>';
+					html += '<div class="user" title="'+user.email+'" id="'+user.id+'">'+user.name+'<img title="Delete" class="delete" src="/icons/delete.png"></div>';
 				}
 				$('.useraccess-modal .user-list').html(html);
 
