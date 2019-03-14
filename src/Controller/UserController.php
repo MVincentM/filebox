@@ -43,10 +43,10 @@ class UserController extends AbstractController
      $chaineAleatoire = '';
      for ($i = 0; $i < $longueur; $i++)
      {
-     $chaineAleatoire .= $caracteres[rand(0, $longueurMax - 1)];
+         $chaineAleatoire .= $caracteres[rand(0, $longueurMax - 1)];
      }
      return $chaineAleatoire;
-    }
+ }
 
         /**
          * @Route("/api/connexion", name="api_connexion")
@@ -161,5 +161,24 @@ class UserController extends AbstractController
             // return $this->render('bas_pas_Co.html.twig', [
             // ]);
         }
+    }
+
+     /**
+       * @Route("/email/exist", name="email_exist")
+       */
+     public function whoAccess(Session $session, Request $request)
+     {
+        $email = $request->query->get("email");
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByMail($email);
+        $json = false;
+        if($user != null && $session->get("isValid") == "true")
+        {        
+            $json = true;
+        }
+        $response = new JsonResponse();
+        $json = stripslashes(json_encode($json));
+        $response = JsonResponse::fromJsonString($json);
+
+        return $response;
     }
 }
