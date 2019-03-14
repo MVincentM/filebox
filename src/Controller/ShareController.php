@@ -96,7 +96,7 @@ class ShareController extends AbstractController
             $json["users"][] = $this->getDoctrine()->getRepository(User::class)->findOneById($val->getId())->getUserShare();
           }
         }
-        else $json["users"] = null;
+        else $json = null;
       }
     }
     $response = new JsonResponse();
