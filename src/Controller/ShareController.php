@@ -41,6 +41,7 @@ class ShareController extends AbstractController
 
           $json = "done";
         }
+        else $json = "y";
       }
       $response = new JsonResponse();
       $json = stripslashes(json_encode($json));

@@ -294,15 +294,17 @@ class TemplateController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($newTemplate);
         $entityManager->flush();
+        $idF = $newTemplate->getId();
         $json = "bddok";
         
       }
       if($json == "bddok")
       {
+        $fileName = $idF."";
         $json = "uploadFailed";
         $repertoireDestination = "serveurTemplates/";
         if (is_uploaded_file($_FILES["file"]["tmp_name"])) {
-          if (move_uploaded_file($_FILES["file"]["tmp_name"],$repertoireDestination.$fileName)) {
+          if (move_uploaded_file($_FILES["file"]["tmp_name"],$repertoireDestination.$fileName.$_FILES["file"]["type"])) {
             echo "Le fichier temporaire ".$_FILES["file"]["tmp_name"].
             " a ete deplace vers ".$repertoireDestination.$fileName;
             $json = "done";
@@ -351,7 +353,7 @@ class TemplateController extends AbstractController
         $newTemplate->setCreator($user->getId());
         $newTemplate->setLastModificator($user->getId());
         $newTemplate->setName($nameFile);
-        $newTemplate->setParent($this->getDoctrine()->getRepository(Template::class)->findOneBy(['creator' => $user->getId(), 'parent' => NULL])->getId());
+        $newTemplate->setParent($this->getDoctrine()->getRepository(Template::class)->findOneBy(['creator' => $user->getId(), 'parent' => $path, "discr"])->getId());
         $newTemplate->setPath($path);
         $date = new DateTime();
         $date->setTimestamp($dateModif);
