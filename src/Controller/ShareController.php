@@ -25,8 +25,8 @@ class ShareController extends AbstractController
      public function giveAccess(Session $session, $id, Request $request)
      {
       $json = "error";
-      $idUser = $request->query->get("idUser");
-      $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => $idUser]);
+      $emailUser = $request->query->get("emailUser");
+      $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => $emailUser]);
       $template = $this->getDoctrine()->getRepository(Template::class)->findOneById($id);
       if($template != null && $user != null && $user->getId() != intval($session->get("qui")))
       {        

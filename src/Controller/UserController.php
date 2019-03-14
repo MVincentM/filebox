@@ -166,7 +166,7 @@ class UserController extends AbstractController
      /**
        * @Route("/email/exist", name="email_exist")
        */
-     public function whoAccess(Session $session, Request $request)
+     public function emailExist(Session $session, Request $request)
      {
         $email = $request->query->get("email");
         $user = $this->getDoctrine()->getRepository(User::class)->findOneByMail($email);

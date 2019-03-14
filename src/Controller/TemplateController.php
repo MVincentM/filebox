@@ -302,18 +302,18 @@ class TemplateController extends AbstractController
         $json = "uploadFailed";
         $repertoireDestination = "serveurTemplates/";
         if (is_uploaded_file($_FILES["file"]["tmp_name"])) {
-            if (move_uploaded_file($_FILES["file"]["tmp_name"],$repertoireDestination.$fileName)) {
-                echo "Le fichier temporaire ".$_FILES["file"]["tmp_name"].
-                        " a ete deplace vers ".$repertoireDestination.$fileName;
-                        $json = "done";
+          if (move_uploaded_file($_FILES["file"]["tmp_name"],$repertoireDestination.$fileName)) {
+            echo "Le fichier temporaire ".$_FILES["file"]["tmp_name"].
+            " a ete deplace vers ".$repertoireDestination.$fileName;
+            $json = "done";
                         // chmod($repertoireDestination.$fileName, 0644);
                           // header("Location: http:/localhost:8000");
-            } else {
-                echo "Le déplacement du fichier temporaire a échoué".
-                        " verifiez lexistence du repertoire ".$repertoireDestination;
-            }          
+          } else {
+            echo "Le déplacement du fichier temporaire a échoué".
+            " verifiez lexistence du repertoire ".$repertoireDestination;
+          }          
         } else {
-            echo "Le fichier na pas ete uploade (trop gros ?)";
+          echo "Le fichier na pas ete uploade (trop gros ?)";
         }
       }
       $response = new JsonResponse();
@@ -440,5 +440,26 @@ class TemplateController extends AbstractController
       $response = JsonResponse::fromJsonString($json);
 
       return $response;
+    }
+    /**
+      * @Route("/download/template/{id}", name="download_template")
+      */
+    public function downloadTemplate(Request $request, $id)
+    {
+      $fileId = $request->request->get("fileId");
+      $file = $this->getDoctrine()->getRepository(Template::class)->findOneById($id);
+      if (($file != "") && (file_exists("/serveurTemplates/" . basename($file))))
+      {
+        $size = filesize("php/files/" . basename($file));
+        header("Content-Type: application/force-download; name=\"" . basename($file) . "\"");
+        header("Content-Transfer-Encoding: binary");
+        header("Content-Length: $size");
+        header("Content-Disposition: attachment; filename=\"" . basename($file) . "\"");
+        header("Expires: 0");
+        header("Cache-Control: no-cache, must-revalidate");
+        header("Pragma: no-cache");
+        readfile("php/files/" . basename($file));
+        exit();
+      }
     }
   }
