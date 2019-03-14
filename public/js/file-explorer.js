@@ -96,7 +96,6 @@ function build(id){
 					html += '<th scope="row"><img src="'+icon+'"></th>';
 					html += '<td>'+ f.name +'</td>';
 					html += '<td>'+ f.lastUpdate +'</td>';
-					html += '<td>'+ (f.version ? f.version : '') +'</td>';
 					html += '<td>'+ f.lastUpdator +'</td>';
 					html += '<td>'+ f.creator +'</td>';
 					html += '<td><img title="Download" class="download" src="/icons/download.png">'
@@ -293,19 +292,15 @@ function askUserAccess(id, name, onOk){
 
 	// Body
 	html += '<div class="modal-message"></div>'
-	html += '<div class="autocomplete" style="width:100%;"><input type="text" placeholder="Search a user"></div>';
-	html += '<div class="user-list">No other users has access</div>';
+	html += '<div class="input-group search"><input type="email" class="form-control" placeholder="Search"><div class="input-group-btn"><button class="btn btn-info">Search</button></div></div>';	html += '<div class="user-list">No other users has access</div>';
 
 	html += '</div><div class="modal-footer"><button class="btn btn-default btn-close" data-dismiss="modal">Close</button></div></div></div></div>';
 
 	$('body').append(html);
 
-	$('.useraccess-modal .btn-ok').click(function(){
-		var value = $('.useraccess-modal .modal-input').val();
-		if(value != '')
-			onOk(value, function(){
-				$('.useraccess-modal').modal('hide');
-			});
+	$('.useraccess-modal .search .btn').click(function(){
+		var value = $('.useraccess-modal .search input').val();
+		onSelectUser(value);
 	});
 
 	$('.useraccess-modal .modal-title').text("Give access to others");
@@ -319,6 +314,7 @@ function askUserAccess(id, name, onOk){
 			success: function(users){
 				var html = '';
 				for(var i=0; i<users.length; i++){
+					var user = users[i];
 					html += '<div class="user" title="'+user.email+'" id="'+user.id+'">'+user.name+'<img title="Delete" class="delete" src="/icons/delete.png"></div>';
 				}
 				$('.useraccess-modal .user-list').html(html);
@@ -330,10 +326,10 @@ function askUserAccess(id, name, onOk){
 			},
 			error: function(){
 				alert('danger', 'Fail to get users.');
-				$('.useraccess-modal').modal('hide');
 			}
 		})
 	}
+	fetchUserList();
 
 	var onSelectUser = function(userID){
 		$.ajax({
@@ -353,7 +349,7 @@ function askUserAccess(id, name, onOk){
 	var onDeleteUser = function(userID){
 		$.ajax({
 			method: 'POST',
-			url: '/cancel/access/'+id+'?userId='+userId,
+			url: '/cancel/access/'+id+'?userId='+userID,
 			success: function(){
 				alert('success', 'User has been deleted from '+name);
 				fetchUserList();
@@ -364,8 +360,6 @@ function askUserAccess(id, name, onOk){
 			}
 		})
 	}
-
-	autocomplete($('.useraccess-modal .autocomplete input')[0], onSelectUser);
 
     $('.useraccess-modal').modal('show');
 }
