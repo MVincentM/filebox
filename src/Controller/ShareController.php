@@ -26,7 +26,7 @@ class ShareController extends AbstractController
      {
       $json = "error";
       $emailUser = $request->query->get("emailUser");
-      $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => $emailUser]);
+      $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['mail' => $emailUser]);
       $template = $this->getDoctrine()->getRepository(Template::class)->findOneById($id);
       if($template != null && $user != null && $user->getId() != intval($session->get("qui")))
       {        
