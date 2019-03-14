@@ -312,7 +312,7 @@ function askUserAccess(id, name, onOk){
 	$('.useraccess-modal .modal-message').text("Enter the user you want to give access to \""+name+"\"");
 	$('.useraccess-modal .modal-input').val('');
 
-	function fetchUserList(){
+	var fetchUserList = function(){
 		$.ajax({
 			method: 'POST',
 			url: '/getUserAccess/'+id,
@@ -330,12 +330,12 @@ function askUserAccess(id, name, onOk){
 			},
 			error: function(){
 				alert('danger', 'Fail to get users.');
-				close();
+				$('.useraccess-modal').modal('hide');
 			}
 		})
 	}
 
-	onSelectUser = function(userID){
+	var onSelectUser = function(userID){
 		$.ajax({
 			method: 'POST',
 			url: '/addUser/'+userID+'/to/'+id,
@@ -344,13 +344,13 @@ function askUserAccess(id, name, onOk){
 				fetchUserList();
 			},
 			error: function(){
-				alert('success', 'Fail to add user to '+name);
-				close();
+				alert('danger', 'Fail to add user to '+name);
+				$('.useraccess-modal').modal('hide');
 			}
 		})
 	}
 
-	onDeleteUser = function(userID){
+	var onDeleteUser = function(userID){
 		$.ajax({
 			method: 'POST',
 			url: '/removeUser/'+userID+'/from/'+id,
@@ -359,8 +359,8 @@ function askUserAccess(id, name, onOk){
 				fetchUserList();
 			},
 			error: function(){
-				alert('success', 'Fail to delete user from '+name);
-				close();
+				alert('danger', 'Fail to delete user from '+name);
+				$('.useraccess-modal').modal('hide');
 			}
 		})
 	}
@@ -388,7 +388,6 @@ function autocomplete(inp, onSelect) {
       /*append the DIV element as a child of the autocomplete container:*/
       this.parentNode.appendChild(a);
 
-
       // JS search
       /*for each item in the array...*/
      /* for (i = 0; i < arr.length; i++) {
@@ -413,53 +412,63 @@ function autocomplete(inp, onSelect) {
       }*/
 
       // Remote search
-      $.ajax({
-      	method: 'POST',
-		url: '/search/'+val,
-		success: function(users){
-			for(let i=0; i<users.length; i++){
-			  // create a DIV element for each matching element:
-	          b = document.createElement("DIV");
-	          // make the matching letters bold:
-	          b.innerHTML = "<strong>" + users[i].name.substr(0, val.length) + "</strong>";
-	          b.innerHTML += users[i].name.substr(val.length);
-	          // insert a input field that will hold the current array item's value:
-	          b.innerHTML += "<input type='hidden' value='" + users[i].name + "'>";
-	          // execute a function when someone clicks on the item value (DIV element):
-	          b.addEventListener("click", function(e) {
-	          	  // reset iput
-	              inp.value = '';
-	              // close the list of autocompleted values, (or any other open lists of autocompleted values:
-	              closeAllLists();
-	              // callback
-	              onSelect(users[i].id);
-	          });
-	          a.appendChild(b);
-	        }
-		},
-		error: function(){
-			var users = ['No users','enfin si peut etre','le truc c\'est que','y\a pas d\'api', 'lol'];
-			for(var i=0; i<users.length; i++){
-			  // create a DIV element for each matching element:
-	          b = document.createElement("DIV");
-	          // make the matching letters bold:
-	          b.innerHTML = "<strong>" + users[i].substr(0, val.length) + "</strong>";
-	          b.innerHTML += users[i].substr(val.length);
-	          // insert a input field that will hold the current array item's value:
-	          b.innerHTML += "<input type='hidden' value='" + users[i] + "'>";
-	          // execute a function when someone clicks on the item value (DIV element):
-	          b.addEventListener("click", function(e) {
-	          	  // reset iput
-	              inp.value = '';
-	              // close the list of autocompleted values, (or any other open lists of autocompleted values:
-	              closeAllLists();
-	              // callback
-	              onSelect(users[i]);
-	          });
-	          a.appendChild(b);
-	        }
-		}
-      })
+      var savedInput = inp.value;
+      setTimeout(function(){
+      	if(inp.value === savedInput) // if the user hasn't tap from 0,5 sec, fetch data
+      		fetchResults();
+      }, 500);
+
+      var fetchResults = function(){
+	      $.ajax({
+	      	method: 'POST',
+			url: '/search/'+inp.value,
+			success: function(users){
+				for(let i=0; i<users.length; i++){
+				  // create a DIV element for each matching element:
+		          b = document.createElement("DIV");
+		          // make the matching letters bold:
+		          b.innerHTML = "<strong>" + users[i].name.substr(0, inp.value.length) + "</strong>";
+		          b.innerHTML += users[i].name.substr(inp.value.length);
+		          // insert a input field that will hold the current array item's value:
+		          b.innerHTML += "<input type='hidden' value='" + users[i].name + "'>";
+		          // execute a function when someone clicks on the item value (DIV element):
+		          b.addEventListener("click", function(e) {
+		          	  // reset iput
+		              inp.value = '';
+		              // close the list of autocompleted values, (or any other open lists of autocompleted values:
+		              closeAllLists();
+		              // callback
+		              onSelect(users[i].id);
+		          });
+		          a.appendChild(b);
+		        }
+			},
+			error: function(){
+				// Temporary code, waiting for the api to work
+
+				var users = ['No users','enfin si peut etre','le truc c\'est que','y\a pas d\'api', 'lol'];
+				for(var i=0; i<users.length; i++){
+				  // create a DIV element for each matching element:
+		          b = document.createElement("DIV");
+		          // make the matching letters bold:
+		          b.innerHTML = "<strong>" + users[i].substr(0, inp.value.length) + "</strong>";
+		          b.innerHTML += users[i].substr(inp.value.length);
+		          // insert a input field that will hold the current array item's value:
+		          b.innerHTML += "<input type='hidden' value='" + users[i] + "'>";
+		          // execute a function when someone clicks on the item value (DIV element):
+		          b.addEventListener("click", function(e) {
+		          	  // reset iput
+		              inp.value = '';
+		              // close the list of autocompleted values, (or any other open lists of autocompleted values:
+		              closeAllLists();
+		              // callback
+		              onSelect(users[i]);
+		          });
+		          a.appendChild(b);
+		        }
+			}
+	      })
+	  }
   });
   /*execute a function presses a key on the keyboard:*/
   inp.addEventListener("keydown", function(e) {
