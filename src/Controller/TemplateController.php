@@ -300,11 +300,12 @@ class TemplateController extends AbstractController
       }
       if($json == "bddok")
       {
+        $ext = pathinfo($fileName, PATHINFO_EXTENSION);
         $fileName = $idF."";
         $json = "uploadFailed";
         $repertoireDestination = "serveurTemplates/";
         if (is_uploaded_file($_FILES["file"]["tmp_name"])) {
-          if (move_uploaded_file($_FILES["file"]["tmp_name"],$repertoireDestination.$fileName.$_FILES["file"]["type"])) {
+          if (move_uploaded_file($_FILES["file"]["tmp_name"],$repertoireDestination.$fileName.".".$ext)) {
             echo "Le fichier temporaire ".$_FILES["file"]["tmp_name"].
             " a ete deplace vers ".$repertoireDestination.$fileName;
             $json = "done";
@@ -446,50 +447,45 @@ class TemplateController extends AbstractController
     /**
       * @Route("/download/template/{id}", name="download_template")
       */
-    public function downloadTemplate(Request $request, $id)
+    public function downloadTemplate(Request $request, $id, Session $session)
     {
-      $json = "error";
       $fileId = $request->request->get("fileId");
       $file = $this->getDoctrine()->getRepository(Template::class)->findOneById($id);
       $fileShared = $this->getDoctrine()->getRepository(Share::class)->findOneBy(['idTemplate' => $id]);
       if($file != null)
       {
-        $json = "ok";
-
-        if (file_exists("/serveurTemplates/" . basename($file->getName())) && $file->getCreator() == intval($session->get("qui")) )
+        $ext = pathinfo($file->getName(), PATHINFO_EXTENSION);
+        if (file_exists("serveurTemplates/" . basename($file->getId().".".$ext)) && $file->getCreator() == intval($session->get("qui")) )
         {
-          $size = filesize("php/files/" . basename($file));
-          header("Content-Type: application/force-download; name=\"" . basename($file) . "\"");
+          $size = filesize("serveurTemplates/" . basename($file->getId().".".$ext));
+          header("Content-Type: application/force-download; name=\"" . basename($file->getId().".".$ext) . "\"");
           header("Content-Transfer-Encoding: binary");
           header("Content-Length: $size");
-          header("Content-Disposition: attachment; filename=\"" . basename($file) . "\"");
+          header("Content-Disposition: attachment; filename=\"" . basename($file->getName()) . "\"");
           header("Expires: 0");
           header("Cache-Control: no-cache, must-revalidate");
           header("Pragma: no-cache");
-          readfile("php/files/" . basename($file));
+          readfile("serveurTemplates/" . basename($file->getId().".".$ext));
           exit();
         }
       }
       else if($fileShared != null)
       {
-        $json = "ok";
-        if (file_exists("/serveurTemplates/" . basename($fileShared->getName())) && $fileShared->getIdUser() == intval($session->get("qui")))
+        if (file_exists("serveurTemplates/" . basename($fileShared->getId().".".$ext)) && $fileShared->getIdUser() == intval($session->get("qui")))
         {
-          $size = filesize("php/files/" . basename($fileShared));
-          header("Content-Type: application/force-download; name=\"" . basename($fileShared) . "\"");
+          $size = filesize("serveurTemplates/" . basename($fileShared->getId().".".$ext));
+          header("Content-Type: application/force-download; name=\"" . basename($fileShared->getId().".".$ext) . "\"");
           header("Content-Transfer-Encoding: binary");
           header("Content-Length: $size");
-          header("Content-Disposition: attachment; filename=\"" . basename($fileShared) . "\"");
+          header("Content-Disposition: attachment; filename=\"" . basename($fileShared->getName()) . "\"");
           header("Expires: 0");
           header("Cache-Control: no-cache, must-revalidate");
           header("Pragma: no-cache");
-          readfile("php/files/" . basename($fileShared));
+          readfile("serveurTemplates/" . basename($fileShared->getId().".".$ext));
           exit();
         }
       }
-      $response = new JsonResponse();
-      $json = stripslashes(json_encode($json));
-      $response = JsonResponse::fromJsonString($json);
-      return $response;
+
+      return new Response();
     }
   }
