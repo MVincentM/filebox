@@ -315,7 +315,7 @@ function askUserAccess(id, name, onOk){
 	var fetchUserList = function(){
 		$.ajax({
 			method: 'POST',
-			url: '/getUserAccess/'+id,
+			url: '/who/access/'+id,
 			success: function(users){
 				var html = '';
 				for(var i=0; i<users.length; i++){
@@ -338,7 +338,7 @@ function askUserAccess(id, name, onOk){
 	var onSelectUser = function(userID){
 		$.ajax({
 			method: 'POST',
-			url: '/addUser/'+userID+'/to/'+id,
+			url: '/give/access/'+id+'?userId='+userID,
 			success: function(){
 				alert('success', 'New user has been added to '+name);
 				fetchUserList();
@@ -353,7 +353,7 @@ function askUserAccess(id, name, onOk){
 	var onDeleteUser = function(userID){
 		$.ajax({
 			method: 'POST',
-			url: '/removeUser/'+userID+'/from/'+id,
+			url: '/cancel/access/'+id+'?userId='+userId,
 			success: function(){
 				alert('success', 'User has been deleted from '+name);
 				fetchUserList();
