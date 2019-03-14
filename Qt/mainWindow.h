@@ -6,17 +6,22 @@
 #include <fstream>
 #include <sstream>
 
+#include "websocket.h"
+#include "httprequest.hpp"
+
 class MainWindow : public QWidget
 {
 Q_OBJECT
 
 public:
-    MainWindow();
+    MainWindow(WebSocket* webSocket);
 
 private slots:
    void changeLogin();
    void viewOnline();
    void selectFolder();
+   void checkSync();
+   void onResult(QNetworkReply*);
 
 private:
    QLabel *m_status;
@@ -26,6 +31,12 @@ private:
 
    QPushButton *m_changeLogin;
    QPushButton *m_quit;
+
+   WebSocket* m_webSocket;
+   QTimer* mTimer;
+
+   QNetworkAccessManager *m_networkManager;
+   QNetworkRequest m_request;
 };
 
 #endif // MAINWINDOW_H

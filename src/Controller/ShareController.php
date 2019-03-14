@@ -25,8 +25,8 @@ class ShareController extends AbstractController
      public function giveAccess(Session $session, $id, Request $request)
      {
       $json = "error";
-      $email = $request->query->get("email");
-      $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['email' => $email]);
+      $idUser = $request->query->get("idUser");
+      $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => $idUser]);
       $template = $this->getDoctrine()->getRepository(Template::class)->findOneById($id);
       if($template != null && $user != null && $user->getId() != intval($session->get("qui")))
       {        
@@ -93,7 +93,7 @@ class ShareController extends AbstractController
           $json = array();
           foreach($access as $val)
           {
-            $json[] = $this->getDoctrine()->getRepository(User::class)->findOneById($val->getId())->getUserShare();
+            $json["users"][] = $this->getDoctrine()->getRepository(User::class)->findOneById($val->getId())->getUserShare();
           }
         }
         else $json = "notShared";

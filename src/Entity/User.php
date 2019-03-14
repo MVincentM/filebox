@@ -20,7 +20,7 @@ class User
             'email' => $this->getMail(),
             'id' => $this->getId()
         );
-        return $name;
+        return $json;
     }
     /**
      * @ORM\Id()
