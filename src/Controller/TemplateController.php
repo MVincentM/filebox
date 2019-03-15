@@ -100,6 +100,8 @@ class TemplateController extends AbstractController
           $jsonTemp = $temp->toJSON(false); 
           $jsonTemp["creator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["creator"])])->getUserName();
           $jsonTemp["lastUpdator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["lastUpdator"])])->getUserName();
+          $jsonTemp["edit"] = true;
+          if(intval($jsonTemp["creator"]) != intval($session->get("qui"))) $jsonTemp["edit"] = false;
           $json[] = $jsonTemp;
         }
 
