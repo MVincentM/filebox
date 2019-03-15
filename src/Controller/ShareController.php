@@ -94,8 +94,8 @@ class ShareController extends AbstractController
           $json = array();
           foreach($access as $val)
           {
-            echo var_dump($val);
-            $json["users"][] = $this->getDoctrine()->getRepository(User::class)->findOneById($val->getId())->getUserShare();
+            // echo var_dump($val);
+            $json["users"][] = $this->getDoctrine()->getRepository(User::class)->findOneById($val->getIdUser())->getUserShare();
           }
         }
         else $json = null;
