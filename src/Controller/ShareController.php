@@ -28,10 +28,11 @@ class ShareController extends AbstractController
       $emailUser = $request->query->get("emailUser");
       $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['mail' => $emailUser]);
       $template = $this->getDoctrine()->getRepository(Template::class)->findOneById($id);
-      $share = $this->getDoctrine()->getRepository(Share::class)->findOneBy(['idUser' => $user->getId(), 'idTemplate' => $id]);
-      if($template != null && $user != null && $user->getId() != intval($session->get("qui")) && $share == null)
+
+      if($template != null && $user != null && $user->getId() != intval($session->get("qui")))
       {        
-        if($session->get("isValid") == "true" && $template->getCreator() == intval($session->get("qui")))
+        $share = $this->getDoctrine()->getRepository(Share::class)->findOneBy(['idUser' => $user->getId(), 'idTemplate' => $id]);
+        if($session->get("isValid") == "true" && $template->getCreator() == intval($session->get("qui")) && $share == null)
         {
           $newShare = new Share();
           $newShare->setIdTemplate($id);
@@ -42,12 +43,11 @@ class ShareController extends AbstractController
 
           $json = "done";
         }
-        else $json = "y";
+        else if ($share != null) $json = "alreadyShared";
       }
-      else if ($share != null) $json = "alreadyShared";
       else if($user == null) $json = "emailNotValid";
       else if($user->getId() == intval($session->get("qui"))) $json = "notAllowedToShareWithYourself";
-      
+
       $response = new JsonResponse();
       $json = stripslashes(json_encode($json));
       $response = JsonResponse::fromJsonString($json);
