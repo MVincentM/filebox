@@ -342,9 +342,23 @@ function askUserAccess(id, name, onOk){
 			$.ajax({
 				method: 'POST',
 				url: '/give/access/'+id+'?emailUser='+email,
-				success: function(){
-					alert('success', 'New user has been added to '+name);
-					fetchUserList();
+				success: function(response){
+					if(response == 'done'){
+						alert('success', 'New user has been added to '+name);
+						fetchUserList();
+					}
+					else if(response == 'error'){
+						alert('danger', 'Fail to add user '+email);
+					}
+					else if(response == 'alreadyShared'){
+						alert('danger', name+' is already shared with '+email);
+					}
+					else if(response == 'emailNotValid'){
+						alert('danger', email+' isn\'t a valid email');
+					}
+					else if(response == 'notAllowedToShareWithYourself'){
+						alert('danger', 'You cannot share something with yourself !');
+					}
 				},
 				error: function(){
 					alert('danger', 'Fail to add user to '+name);
