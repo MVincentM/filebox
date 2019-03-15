@@ -89,6 +89,15 @@ form label.error {
 	text-align: center;
 	font-style: italic;
 }
+.modal .userlist {
+	padding-top: 20px;
+    text-align: center;
+}
+.modal .userlist img {
+	cursor: pointer;
+	width: 20px;
+	margin-left: 5px;
+}
 /* Left-bar and Top-bar */
 .main .root .top-bar {
 	width: 100%;

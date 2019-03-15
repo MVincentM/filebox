@@ -292,7 +292,8 @@ function askUserAccess(id, name, onOk){
 
 	// Body
 	html += '<div class="modal-message"></div>'
-	html += '<div class="input-group search"><input type="email" class="form-control" placeholder="Search"><div class="input-group-btn"><button class="btn btn-info">Search</button></div></div>';	html += '<div class="user-list">No other users has access</div>';
+	html += '<div class="input-group search"><input type="email" class="form-control" placeholder="Search"><div class="input-group-btn"><button class="btn btn-info">Search</button></div></div>';	
+	html += '<div class="userlist"></div>';
 
 	html += '</div><div class="modal-footer"><button class="btn btn-default btn-close" data-dismiss="modal">Close</button></div></div></div></div>';
 
@@ -311,18 +312,23 @@ function askUserAccess(id, name, onOk){
 		$.ajax({
 			method: 'POST',
 			url: '/who/access/'+id,
-			success: function(users){
+			success: function(data){
 				var html = '';
-				for(var i=0; i<users.length; i++){
-					var user = users[i];
-					html += '<div class="user" title="'+user.email+'" id="'+user.id+'">'+user.name+'<img title="Delete" class="delete" src="/icons/delete.png"></div>';
-				}
-				$('.useraccess-modal .user-list').html(html);
+				if(data != null && data.users != null){
+					for(var i=0; i<data.users.length; i++){
+						var user = data.users[i];
+						html += '<div class="user" title="'+user.email+'" id="'+user.id+'">'+user.name+'<img title="Delete" class="delete" src="/icons/delete.png"></div>';
+					}
+					$('.useraccess-modal .userlist').html(html);
 
-				$('.useraccess-modal .user-list .delete').click(function(event){
-					var target = event.currentTarget.parentElement;
-					onDeleteUser(target.id);
-				});
+					$('.useraccess-modal .userlist .delete').click(function(event){
+						var target = event.currentTarget.parentElement;
+						onDeleteUser(target.id);
+					});
+				}
+				else{
+					$('.useraccess-modal .userlist').text('No other users has access');
+				}
 			},
 			error: function(){
 				alert('danger', 'Fail to get users.');
@@ -331,25 +337,26 @@ function askUserAccess(id, name, onOk){
 	}
 	fetchUserList();
 
-	var onSelectUser = function(userID){
-		$.ajax({
-			method: 'POST',
-			url: '/give/access/'+id+'?userId='+userID,
-			success: function(){
-				alert('success', 'New user has been added to '+name);
-				fetchUserList();
-			},
-			error: function(){
-				alert('danger', 'Fail to add user to '+name);
-				$('.useraccess-modal').modal('hide');
-			}
-		})
+	var onSelectUser = function(email){
+		if(email != '')
+			$.ajax({
+				method: 'POST',
+				url: '/give/access/'+id+'?emailUser='+email,
+				success: function(){
+					alert('success', 'New user has been added to '+name);
+					fetchUserList();
+				},
+				error: function(){
+					alert('danger', 'Fail to add user to '+name);
+					$('.useraccess-modal').modal('hide');
+				}
+			})
 	}
 
 	var onDeleteUser = function(userID){
 		$.ajax({
 			method: 'POST',
-			url: '/cancel/access/'+id+'?userId='+userID,
+			url: '/cancel/access/'+id+'?idUser='+userID,
 			success: function(){
 				alert('success', 'User has been deleted from '+name);
 				fetchUserList();
