@@ -59,7 +59,7 @@ class ShareController extends AbstractController
       // $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['email' => $email]);
       $template = $this->getDoctrine()->getRepository(Template::class)->findOneById($id);
       $share = $this->getDoctrine()->getRepository(Share::class)->findOneBy(['idUser' => $idUser, 'idTemplate' => $id]);
-      if($template != null && $hare != null)
+      if($template != null && $share != null)
       {        
         if($session->get("isValid") == "true" && $template->getCreator() == intval($session->get("qui")))
         {
