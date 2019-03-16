@@ -490,4 +490,31 @@ class TemplateController extends AbstractController
 
       return new Response();
     }
+    /**
+      * @Route("/visualiser/template/{id}", name="visualiser_template")
+      */
+    public function visualiserTemplate(Request $request, $id, Session $session)
+    {
+      $fileId = $request->request->get("fileId");
+      $file = $this->getDoctrine()->getRepository(Template::class)->findOneById($id);
+      $fileShared = $this->getDoctrine()->getRepository(Share::class)->findOneBy(['idTemplate' => $id]);
+      if($file != null)
+      {
+        $ext = pathinfo($file->getName(), PATHINFO_EXTENSION);
+        if (file_exists("serveurTemplates/" . basename($file->getId().".".$ext)) && $file->getCreator() == intval($session->get("qui")) )
+        {
+
+          readfile("serveurTemplates/" . basename($file->getId().".".$ext));
+        }
+      }
+      else if($fileShared != null)
+      {
+        if (file_exists("serveurTemplates/" . basename($fileShared->getId().".".$ext)) && $fileShared->getIdUser() == intval($session->get("qui")))
+        {
+          readfile("serveurTemplates/" . basename($fileShared->getId().".".$ext));
+        }
+      }
+
+      return new Response();
+    }
   }
