@@ -99,9 +99,10 @@ function build(id){
 					html += '<td>'+ f.lastUpdator +'</td>';
 					html += '<td>'+ f.creator +'</td>';
 					html += '<td><img title="Download" class="download" src="/icons/download.png">'
-								+'<img title="Rename" class="edit" src="/icons/edit.png">'
-								+'<img title="Shared" class="user-access" src="/icons/users.png">'
-								+'<img title="Delete" class="delete" src="/icons/delete.png"></td>';
+								+ (f.edit ?'<img title="Manage user access" class="user-access" src="/icons/users.png">'
+										+'<img title="Rename" class="edit" src="/icons/edit.png">'
+										+'<img title="Delete" class="delete" src="/icons/delete.png"></td>'
+									: '<img title="You can\'t manage as you\'re not the owner of this file" src="/icons/no-users.png">');
 					html += '</tr>';
 				}
 
@@ -121,6 +122,14 @@ function build(id){
 				}
 				appendToBreardcrumbs(currentFolder);
 				refresh();	
+			});
+
+			$('.file-explorer tr.file').click(function(event){
+				var target = event.currentTarget,
+					id = target.getAttribute('id'),
+				 	name = target.getAttribute('name');
+	
+				previewFile(id, name);
 			});
 
 			$('img.download').click(function(event){
@@ -270,6 +279,49 @@ function askFiles(title, message, onOk){
     $('.askFiles-modal').modal('show');
 }
 
+function previewFile(id, name){
+
+	$('.askFiles-modal').remove();
+
+	html = '<div class="modal askFiles-modal fade" role="dialog"><div class="modal-dialog large">';
+	html += '<div class="modal-content"><div class="modal-header">';
+	html += '<h4 class="modal-title">Preview of '+name+'</h4><button type="button" class="close" data-dismiss="modal">&times;</button></div>';
+	html += '<div class="modal-body">';
+
+	// Body
+	html += '<div class="modal-message"></div>';
+	html += '<div class="preview"></div>';
+
+	html += '</div><div class="modal-footer"><button type="button" class="btn btn-info btn-ok">Ok</button><button type="button" class="btn btn-default btn-close" data-dismiss="modal">Close</button></div></div></div></div>';
+
+	$('body').append(html);
+
+
+	var split = name.split('.');
+	if(split.length > 0 ) var extension = split[split.length-1].toUpperCase()
+	if(extension === 'PNG' || extension === 'JPG'){
+		$('.preview').html('<img src="/visualiser/template/'+id+'" alt="'+name+'" style="width:100%">');
+	}
+	else if(extension === 'PDF'){
+
+	}
+	else if(extension === 'TXT'){
+		$.ajax({
+			method: 'GET',
+			url: '/visualiser/template/'+id,
+			success: function(response){
+				$('.modal-message').html('<h5>Content of the file:</h5>');
+				$('.preview').text(response);
+			}
+		});
+	}
+	else {
+		$('.modal-message').html('File format is unknown');
+	}
+
+    $('.askFiles-modal').modal('show');
+}
+
 function alert(type, message){
 	$('.alerts').prepend('<div class="alert alert-'+type+'">'+message+'<strong>X</strong></div>');
 
@@ -292,7 +344,7 @@ function askUserAccess(id, name, onOk){
 
 	// Body
 	html += '<div class="modal-message"></div>'
-	html += '<div class="input-group search"><input type="email" class="form-control" placeholder="Search"><div class="input-group-btn"><button class="btn btn-info">Search</button></div></div>';	
+	html += '<div class="input-group search"><input type="email" class="form-control" placeholder="Email"><div class="input-group-btn"><button class="btn btn-info">Search</button></div></div>';	
 	html += '<div class="userlist"></div>';
 
 	html += '</div><div class="modal-footer"><button class="btn btn-default btn-close" data-dismiss="modal">Close</button></div></div></div></div>';
@@ -384,6 +436,8 @@ function askUserAccess(id, name, onOk){
 
     $('.useraccess-modal').modal('show');
 }
+
+
 
 function autocomplete(inp, onSelect) {
   /*the autocomplete function takes two arguments,

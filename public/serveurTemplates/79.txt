@@ -1,0 +1,33 @@
+Models de communication
+	- Device to device
+		- 2 or more devices directly connected to each other
+		- exemple : home automation, small data packets
+		- protocols : Bluetooth, Z-Wave or Zigbee
+	- Device to cloud
+		- device connected to internet
+		- ethernet or wi-fi, IP netowrk
+		- remotley access the device via a smartphone or web interface
+		- exemple: smart thermostat, smart TV
+	- Device to gateway
+		- intermedaire to provide security
+		- exemple: Fitness tracker, connected to the phone which is a act as a gateway
+
+
+3 Key factors for a device
+	- Range
+	- Data rate / bandwith
+	- Power consumption (the range and bandwith are high, the more it consume battery)
+
+LPWA Devices
+	- Low power, battery operate for years
+	- long Range Communication (2-5km for Urban, 10+ for Rural)
+	- Technologies:
+		- sigfox (oldest)
+		- NB-IOT (3G and 4G)
+		- LoRa (robustness against interferance, low cost chirp spread spectrum modulations, used, global commercial use)
+
+LoRa
+	- physical layer that translate data into a RF signal
+	- LoRaWAN is a software protoco that utilizes the LoRa pysical layer
+		- defines the structure of a data package and it defines the way packets are processec in the server
+		- describes how the messages are encrypted
