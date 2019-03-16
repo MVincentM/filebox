@@ -87,11 +87,12 @@ class TemplateController extends AbstractController
         $children = $this->getDoctrine()->getRepository(Template::class)->findBy(['parent' => $id, 'creator' => $session->get('qui')]);
         foreach($children as $child)
         {
-          $jsonTemp = $child->toJSON(false); 
+          $jsonTemp = $child->toJSON(false);
+          $idCreator =  intval($jsonTemp["creator"]);
           $jsonTemp["creator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["creator"])])->getUserName();
           $jsonTemp["lastUpdator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["lastUpdator"])])->getUserName();
           $jsonTemp["edit"] = true;
-          if(intval($jsonTemp["creator"]) != intval($session->get("qui"))) $jsonTemp["edit"] = false;
+          if($idCreator != intval($session->get("qui"))) $jsonTemp["edit"] = false;
           $json[] = $jsonTemp;
         }
 
@@ -100,10 +101,11 @@ class TemplateController extends AbstractController
         {
           $temp = $this->getDoctrine()->getRepository(Template::class)->findOneById($val->getIdTemplate());
           $jsonTemp = $temp->toJSON(false); 
+          $idCreator =  intval($jsonTemp["creator"]);
           $jsonTemp["creator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["creator"])])->getUserName();
           $jsonTemp["lastUpdator"] = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => intval($jsonTemp["lastUpdator"])])->getUserName();
           $jsonTemp["edit"] = true;
-          if(intval($jsonTemp["creator"]) != intval($session->get("qui"))) $jsonTemp["edit"] = false;
+          if($idCreator != intval($session->get("qui"))) $jsonTemp["edit"] = false;
           $json[] = $jsonTemp;
         }
 
