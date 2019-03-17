@@ -281,9 +281,9 @@ function askFiles(title, message, onOk){
 
 function previewFile(id, name){
 
-	$('.askFiles-modal').remove();
+	$('.preview-modal').remove();
 
-	html = '<div class="modal askFiles-modal fade" role="dialog"><div class="modal-dialog large">';
+	html = '<div class="modal preview-modal fade" role="dialog"><div class="modal-dialog large">';
 	html += '<div class="modal-content"><div class="modal-header">';
 	html += '<h4 class="modal-title">Preview of '+name+'</h4><button type="button" class="close" data-dismiss="modal">&times;</button></div>';
 	html += '<div class="modal-body">';
@@ -319,7 +319,7 @@ function previewFile(id, name){
 		$('.modal-message').html('File format is unknown');
 	}
 
-    $('.askFiles-modal').modal('show');
+    $('.preview-modal').modal('show');
 }
 
 function alert(type, message){

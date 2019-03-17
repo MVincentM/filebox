@@ -216,3 +216,43 @@ form label.error {
   background-color: DodgerBlue !important; 
   color: #ffffff; 
 }
+
+/* mobile format */
+@media screen and (max-width: 1280px)
+{
+	.main .root .top-bar .navbar-title {
+		font-size: 38px;
+	}
+    .main .root .nav-link {
+    	font-size: 28px;
+    }
+	.left-bar li.nav-item {
+	    padding-top: 30px;
+	}
+	.top-bar li.nav-item {
+	    padding-left: 30px;
+	}
+	.content .header .breadcrumbs span,
+	.buttons button {
+    	font-size: 25px;
+    }
+    .file-explorer {
+    	font-size: 24px;
+    }
+    .file-explorer tr th:nth-child(3)
+    .file-explorer tr td:nth-child(3), 
+    .file-explorer tr th:nth-child(4),
+    .file-explorer tr td:nth-child(4) {
+	    display: none;
+	}
+
+	.file-explorer tr td:nth-child(6) {
+		width: 130px;
+	}
+
+	.content .file-explorer td img {
+		width: 30px;
+		margin: 10px;
+		cursor: pointer;
+	}
+}
