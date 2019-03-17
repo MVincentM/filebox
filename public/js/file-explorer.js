@@ -1,6 +1,7 @@
 var HOME_ID;
 var currentFolder = {}
 
+// Build Home, update homeID if specified
 function init(homeID){
 	if(homeID !== undefined) HOME_ID = homeID;
 	currentFolder = {
@@ -10,11 +11,13 @@ function init(homeID){
 	refresh();
 }
 
+// Handle Home element of the breadcrumbs
 $('.goHome').click(function(){
 	init();
 	$('.breadcrumbs :not(.fixed)').remove();
 });
 
+// Handle event add folder
 $('.add-folder').click(function(){
 	prompt('Add a folder to '+currentFolder.title, 'Enter the name of the new folder:', function(folderName, close){
 		$.ajax({
@@ -33,6 +36,7 @@ $('.add-folder').click(function(){
 	});
 });
 
+// Handle event add file
 $('.add-file').click(function(){
 	askFiles('Add a file to '+currentFolder.title, null, function(files, close){
 		var xhr = new XMLHttpRequest();
@@ -70,11 +74,13 @@ $('.add-file').click(function(){
 	});
 });
 
+// Refresh the current folder
 function refresh(){
 	clearTable();
 	build(currentFolder.id);
 }
 
+// build the content of folder "id"
 function build(id){
 	$.ajax({
 		method: 'POST',
@@ -193,6 +199,7 @@ function build(id){
 	});
 }
 
+// build the breadcrumbs
 function appendToBreardcrumbs(f){
 	if(f.id != 0){
 		$('.breadcrumbs').append('<b>></b><span folder-id="'+f.id+'">'+f.title+'</span>');
@@ -214,6 +221,7 @@ function clearTable(){
 	$('.file-explorer tbody').html('');
 }
 
+// Show a modal with an input
 function prompt(title, message, onOk){
 
 	$('.prompt-modal').remove();
@@ -246,6 +254,7 @@ function prompt(title, message, onOk){
     $('.prompt-modal').modal('show');
 }
 
+// Show a modal with an input type file
 function askFiles(title, message, onOk){
 
 	$('.askFiles-modal').remove();
@@ -279,6 +288,7 @@ function askFiles(title, message, onOk){
     $('.askFiles-modal').modal('show');
 }
 
+// Show a modal previewing a file. Handle PNG, JPG and TXT
 function previewFile(id, name){
 
 	$('.preview-modal').remove();
@@ -322,6 +332,7 @@ function previewFile(id, name){
     $('.preview-modal').modal('show');
 }
 
+// Show alert. type can have values "success", "danger" or "warn"
 function alert(type, message){
 	$('.alerts').prepend('<div class="alert alert-'+type+'">'+message+'<strong>X</strong></div>');
 
@@ -333,6 +344,7 @@ function alert(type, message){
 	}
 }
 
+// Show modal user access. Can see the user list, add new or delete one
 function askUserAccess(id, name, onOk){
 
 	$('.useraccess-modal').remove();
@@ -438,7 +450,7 @@ function askUserAccess(id, name, onOk){
 }
 
 
-
+// Unused function
 function autocomplete(inp, onSelect) {
   /*the autocomplete function takes two arguments,
   the text field element and an array of possible autocompleted values:*/
